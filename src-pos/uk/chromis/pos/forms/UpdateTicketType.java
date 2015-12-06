@@ -68,25 +68,16 @@ public class UpdateTicketType {
                         byte[] bytesData = rs.getBytes("CONTENT");
                         if (!"49".equals(rs.getString("ID"))) {
                             decodedData = new String(bytesData);
-                            decodedData = decodedData.replaceAll(".ticketType} == 0", ".ticketType} == \"NORMAL\"");
-                            decodedData = decodedData.replaceAll(".ticketType} == 1", ".ticketType} == \"REFUND\"");
-                            decodedData = decodedData.replaceAll(".ticketType} == 2", ".ticketType} == \"PAYMENT\"");
-                            decodedData = decodedData.replaceAll(".ticketType} == 3", ".ticketType} == \"NOSALE\"");
+                            
+                            decodedData = decodedData.replaceAll(".ticketType} *== *0", ".ticketType} == \"NORMAL\"");
+                            decodedData = decodedData.replaceAll(".ticketType} *== *1", ".ticketType} == \"REFUND\"");
+                            decodedData = decodedData.replaceAll(".ticketType} *== *2", ".ticketType} == \"PAYMENT\"");
+                            decodedData = decodedData.replaceAll(".ticketType} *== *3", ".ticketType} == \"NOSALE\"");
 
-                            decodedData = decodedData.replaceAll(".ticketType}== 0", ".ticketType} == \"NORMAL\"");
-                            decodedData = decodedData.replaceAll(".ticketType}== 1", ".ticketType} == \"REFUND\"");
-                            decodedData = decodedData.replaceAll(".ticketType}== 2", ".ticketType} == \"PAYMENT\"");
-                            decodedData = decodedData.replaceAll(".ticketType}== 3", ".ticketType} == \"NOSALE\"");
-
-                            decodedData = decodedData.replaceAll(".ticketType}==0", ".ticketType} == \"NORMAL\"");
-                            decodedData = decodedData.replaceAll(".ticketType}==1", ".ticketType} == \"REFUND\"");
-                            decodedData = decodedData.replaceAll(".ticketType}==2", ".ticketType} == \"PAYMENT\"");
-                            decodedData = decodedData.replaceAll(".ticketType}==3", ".ticketType} == \"NOSALE\"");
-
-                            decodedData = decodedData.replaceAll(".ticketType} ==0", ".ticketType} == \"NORMAL\"");
-                            decodedData = decodedData.replaceAll(".ticketType} ==1", ".ticketType} == \"REFUND\"");
-                            decodedData = decodedData.replaceAll(".ticketType} ==2", ".ticketType} == \"PAYMENT\"");
-                            decodedData = decodedData.replaceAll(".ticketType} ==3", ".ticketType} == \"NOSALE\"");
+                            decodedData = decodedData.replaceAll(".ticketType} *!= *0", ".ticketType} != \"NORMAL\"");
+                            decodedData = decodedData.replaceAll(".ticketType} *!= *1", ".ticketType} != \"REFUND\"");
+                            decodedData = decodedData.replaceAll(".ticketType} *!= *2", ".ticketType} != \"PAYMENT\"");
+                            decodedData = decodedData.replaceAll(".ticketType} *!= *3", ".ticketType} != \"NOSALE\"");
 
                             bytesData = decodedData.getBytes();
                             SQL2 = "DELETE FROM RESOURCES WHERE ID = ? ";
@@ -105,6 +96,7 @@ public class UpdateTicketType {
                         }
                     }
                 }
+                System.out.println("**********Convert Executed************");
             } catch (Exception e) {
                 System.out.println("*******************************************************");
                 System.out.println("Error : = " + e);
