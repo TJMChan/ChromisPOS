@@ -1381,14 +1381,7 @@ public abstract class JPanelTicket extends JPanel implements JPanelView, BeanFac
                         //read resource ticket.save and execute
                         if (executeEvent(ticket, ticketext, "ticket.save") == null) {
                             // Save the receipt and assign a receipt number
-                            if (!paymentdialog.isPrintSelected()) {
-                                ticket.setTicketType(TicketType.INVOICE);
-                            }
-
                             try {
-                                if (!paymentdialog.isPrintSelected()) {
-                                    ticket.setTicketType(TicketType.INVOICE);
-                                }
                                 dlSales.saveTicket(ticket, m_App.getInventoryLocation());
 
 // Kidsgrove here the payment has been confirmed lets save voucher details into database vCode10V0061
