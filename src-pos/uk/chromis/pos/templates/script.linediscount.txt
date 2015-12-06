@@ -34,19 +34,27 @@ if (index >= 0) {
     if (ticket.getTotal() > 0.0 && discountrate > 0.0) {
         sdiscount = Formats.PERCENT.formatValue((1-discountrate));
    
-            line = ticket.getLine(index);
+        line = ticket.getLine(index);
 
-            if (line.canDiscount()){
-                    ticket.setLine(index,
-            new TicketLineInfo(
+        if (line.canDiscount()){
+            /*/-- Remove the following lines 
+            ticket.setLine(index,
+                new TicketLineInfo(
                     line.getProductID(),
                     line.getProductName() + " - " + sdiscount,
                     line.getProductTaxCategoryID(),
                     line.getMultiply(),
                     (double)Math.rint(line.getPrice() * discountrate *100) /100d,
                     line.getTaxInfo())); 
-                    line.setDiscounted("yes");
-      }
+            //-- and replace them with the following */
+            line.setProperty("kitchen.name",line.getProductName());
+            line.setProperty("product.name",line.getProductName() + " - " + sdiscount);
+            line.setPrice((double)Math.rint(line.getPrice() * discountrate *100) /100d);
+            //------------------------------------/
+
+            line.setDiscounted("yes");
+        }
+
     } else {
          java.awt.Toolkit.getDefaultToolkit().beep();
     }

@@ -35,14 +35,21 @@ if (index >= 0) {
             line = ticket.getLine(number);
 
             if (line.canDiscount()){
-                    ticket.setLine(number,
-            new TicketLineInfo(
+            /*/-- Remove the following lines 
+            ticket.setLine(index,
+                new TicketLineInfo(
                     line.getProductID(),
                     line.getProductName() + " - " + sdiscount,
                     line.getProductTaxCategoryID(),
                     line.getMultiply(),
                     (double)Math.rint(line.getPrice() * discountrate *100) /100d,
                     line.getTaxInfo())); 
+            //-- and replace them with the following */
+            line.setProperty("kitchen.name",line.getProductName());
+            line.setProperty("product.name",line.getProductName() + " - " + sdiscount);
+            line.setPrice((double)Math.rint(line.getPrice() * discountrate *100) /100d);
+            //------------------------------------/
+
                     line.setDiscounted("yes");
 
         }  

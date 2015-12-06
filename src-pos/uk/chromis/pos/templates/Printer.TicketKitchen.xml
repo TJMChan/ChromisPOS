@@ -80,9 +80,12 @@
             <line size = "1">
                 <text align ="left" length="5">${ticketline.printMultiply()}x</text>
                 #if ($ticketline.isProductCom())
-                    <text align ="left" length="37">--${ticketline.printName()}</text>
+                    <text align ="left" length="2">--${ticketline.getProperty("kitchen.name" )}</text>
+                #end
+                #if($ticketline.getProperty("kitchen.name"))
+                    <text align ="left" length="35">${ticketline.getProperty("kitchen.name"  )}</text>
                 #else
-                    <text align ="left" length="37">${ticketline.printName()}</text>
+                    <text align ="left" length="35">${ticketline.printName()}</text>
                 #end
             </line>
             <!-- Add the following lines only for 2.30 Attributes -->
