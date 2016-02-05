@@ -231,7 +231,15 @@ public class PaymentsModel {
                 
         List<SalesLine> asales = new StaticSentence(app.getSession(),
                 "SELECT TAXCATEGORIES.NAME, SUM(NEWTAXLINES.AMOUNT), SUM(NEWTAXLINES.BASE), SUM(NEWTAXLINES.BASE + NEWTAXLINES.AMOUNT) " +
-                "FROM RECEIPTS, (SELECT ID,RECEIPT,TAXID,BASE,SUM(AMOUNT) as AMOUNT FROM TAXLINES GROUP BY RECEIPT) NEWTAXLINES, TAXES, TAXCATEGORIES WHERE RECEIPTS.ID = NEWTAXLINES.RECEIPT AND NEWTAXLINES.TAXID = TAXES.ID AND TAXES.CATEGORY = TAXCATEGORIES.ID " +
+                "FROM RECEIPTS, "
+                        + "(SELECT TAXLINES.ID,RECEIPT,TAXID,BASE,SUM(AMOUNT) as AMOUNT "
+                        + " FROM TAXLINES,TAXES where TAXLINES.TAXID=TAXES.ID and PARENTID is not null GROUP BY RECEIPT "
+                        + " union "
+                        + " SELECT TAXLINES.ID,RECEIPT,TAXID,BASE,AMOUNT as AMOUNT "
+                        + " FROM TAXLINES,TAXES "
+                        + " where TAXLINES.TAXID=TAXES.ID and PARENTID is null) NEWTAXLINES, "
+                        + " TAXES, TAXCATEGORIES "
+                    + " WHERE RECEIPTS.ID = NEWTAXLINES.RECEIPT AND NEWTAXLINES.TAXID = TAXES.ID AND TAXES.CATEGORY = TAXCATEGORIES.ID " +
                 "AND RECEIPTS.MONEY = ?" +
                 "GROUP BY TAXCATEGORIES.NAME"
                 , SerializerWriteString.INSTANCE
