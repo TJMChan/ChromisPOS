@@ -233,7 +233,7 @@ public class PaymentsModel {
                 "SELECT TAXCATEGORIES.NAME, SUM(NEWTAXLINES.AMOUNT), SUM(NEWTAXLINES.BASE), SUM(NEWTAXLINES.BASE + NEWTAXLINES.AMOUNT) " +
                 "FROM RECEIPTS, "
                         + "(SELECT TAXLINES.ID,RECEIPT,TAXID,BASE,SUM(AMOUNT) as AMOUNT "
-                        + " FROM TAXLINES,TAXES where TAXLINES.TAXID=TAXES.ID and PARENTID is not null GROUP BY RECEIPT "
+                        + " FROM TAXLINES,TAXES where TAXLINES.TAXID=TAXES.ID and PARENTID is not null GROUP BY RECEIPT,PARENTID "
                         + " union "
                         + " SELECT TAXLINES.ID,RECEIPT,TAXID,BASE,AMOUNT as AMOUNT "
                         + " FROM TAXLINES,TAXES "
