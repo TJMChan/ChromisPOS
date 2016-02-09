@@ -606,9 +606,8 @@ public class JPanelCSVImport extends JPanel implements JPanelView {
             dCategory = ((String) cat_list.get(prodInfo.getCategoryID()) == null) ? prodInfo.getCategoryID() : (String) cat_list.get(prodInfo.getCategoryID());
             oldBuyPrice = prodInfo.getPriceBuy();
             oldSellPrice = prodInfo.getPriceSell();
-            productSellPrice *= (1 + dOriginalRate);
             if ((oldBuyPrice != productBuyPrice) || (oldSellPrice != productSellPrice)) {
-                createCSVEntry("Updated Price Details", oldBuyPrice, oldSellPrice * (1 + dOriginalRate));
+                createCSVEntry("Updated Price Details", oldBuyPrice, (jCheckSellIncTax.isSelected())?oldSellPrice * (1 + dOriginalRate):oldSellPrice);
                 createProduct("update");
                 priceUpdates++;
             } else {
