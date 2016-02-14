@@ -70,7 +70,12 @@ public class JPanelResetPickupId extends JPanel implements JPanelView {
 
         
     }
-
+    
+    public JPanelResetPickupId(AppView app) {
+        initComponents();
+        jbtnExit.setVisible(false);
+    }
+    
     /**
      *
      */
