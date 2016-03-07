@@ -25,6 +25,8 @@ import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.Window;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JFrame;
 import uk.chromis.basic.BasicException;
 import uk.chromis.data.user.ListProvider;
@@ -299,6 +301,7 @@ public class JProductFinder extends javax.swing.JDialog {
                 jListProducts.setSelectedIndex(0);
             }
         } catch (BasicException e) {
+            Logger.getLogger(JProductFinder.class.getName()).log(Level.SEVERE, null, e );
         }
         
     }//GEN-LAST:event_jButton3ActionPerformed

@@ -539,7 +539,7 @@ public class DataLogicSales extends BeanFactoryDataSingle {
     public final SentenceList getProductList() {
         return new StaticSentence(s, new QBFBuilder(
                 "SELECT "
-                + getSelectFieldList()
+                + getSelectFieldList().replace("P.STOCKUNITS", "C.UNITS") 
                 + "FROM STOCKCURRENT C RIGHT OUTER JOIN PRODUCTS P ON (C.PRODUCT = P.ID) "
                 + "WHERE ?(QBF_FILTER) "
                 + "ORDER BY P.REFERENCE, P.NAME",
@@ -555,7 +555,7 @@ public class DataLogicSales extends BeanFactoryDataSingle {
     public SentenceList getProductListNormal() {
         return new StaticSentence(s, new QBFBuilder(
                 "SELECT "
-                + getSelectFieldList()
+                + getSelectFieldList().replace("P.STOCKUNITS", "C.UNITS") 
                 + "FROM STOCKCURRENT C RIGHT OUTER JOIN PRODUCTS P ON (C.PRODUCT = P.ID) "
                 + "WHERE P.ISCOM = " + s.DB.FALSE() + " AND ?(QBF_FILTER) "
                 + "ORDER BY P.REFERENCE, P.NAME",
