@@ -47,22 +47,31 @@ message = "Change: " + change;
  FontText.setFont (new Font ( "Arial", Font.BOLD, 36) );
 
 if(isCash) {
-     JOptionPane pane = new JOptionPane();
-     pane.setMessage(FontText);
-     pane.setPreferredSize( new Dimension(450,150));
-     JDialog dialog = pane.createDialog("Cash payment");    
+    JOptionPane pane = new JOptionPane();
+    pane.setMessage(FontText);
+    pane.setPreferredSize( new Dimension(450,150));
+    JDialog dialog = pane.createDialog("Cash payment");    
     new Thread(new Runnable() {
-         void run() {
+        void run() {
             dialog.show();
-         try {
-             m_TTP.printTicket(dlSystem.getResourceAsXML("Display.Message"));
-         } catch (TicketPrinterException ex) {
-             m_App.getDeviceTicket().getDeviceDisplay().writeVisor(AppLocal.APP_NAME, AppLocal.APP_VERSION);
-         }
-
-
-
+            try {
+                 m_TTP.printTicket(dlSystem.getResourceAsXML("Display.Message"));
+            } catch (TicketPrinterException ex) {
+                m_App.getDeviceTicket().getDeviceDisplay().writeVisor(AppLocal.APP_NAME, AppLocal.APP_VERSION);
+            }
         } 
+    }).start();
+}  else {
+    new Thread(new Runnable() {
+        void run() {
+            // delay(ms) - change as required before Welcome message is displayed for non-cash transactions
+            Thread.sleep(2000);
+            try {
+                m_TTP.printTicket(dlSystem.getResourceAsXML("Display.Message"));
+            } catch (TicketPrinterException ex) {
+                m_App.getDeviceTicket().getDeviceDisplay().writeVisor(AppLocal.APP_NAME, AppLocal.APP_VERSION);
+            } 
+        }
     }).start();
 }
 
