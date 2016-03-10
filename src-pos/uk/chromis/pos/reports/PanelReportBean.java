@@ -1,5 +1,5 @@
 //    Chromis POS  - The New Face of Open Source POS
-//    Copyright (c) (c) 2015-2016
+//    Copyright (c) 2015 
 //    http://www.chromis.co.uk
 //
 //    This file is part of Chromis POS
@@ -28,7 +28,6 @@ import uk.chromis.data.loader.QBFBuilder;
 import uk.chromis.data.loader.SerializerReadBasic;
 import uk.chromis.data.loader.StaticSentence;
 import uk.chromis.data.user.EditorCreator;
-import uk.chromis.pos.forms.AppConfig;
 import uk.chromis.pos.forms.AppLocal;
 import uk.chromis.pos.forms.AppView;
 import uk.chromis.pos.forms.BeanFactoryException;
@@ -40,15 +39,19 @@ import uk.chromis.pos.forms.BeanFactoryException;
 public class PanelReportBean extends JPanelReport {
     
     private String title;
-    private String report;    
-    private String resourcebundle = null;    
+    private String report;
+    
+    private String resourcebundle = null;
+    
     private String sentence;
 
     
-
+// JG 16 May 12 use diamond inference
     private List<Datas> fielddatas = new ArrayList<>();
-    private List<String> fieldnames = new ArrayList<>();   
-    private List<String> paramnames = new ArrayList<>();    
+    private List<String> fieldnames = new ArrayList<>();
+    
+    private List<String> paramnames = new ArrayList<>();
+    
     private JParamsComposed qbffilter = new JParamsComposed();
     
     /**
@@ -84,7 +87,8 @@ public class PanelReportBean extends JPanelReport {
      * @return
      */
     @Override
-    protected EditorCreator getEditorCreator() {        
+    protected EditorCreator getEditorCreator() {
+        
         return qbffilter;
     }
 
@@ -134,7 +138,8 @@ public class PanelReportBean extends JPanelReport {
      */
     public void setResourceBundle(String resourcebundle) {
         this.resourcebundle = resourcebundle;
-         /*    
+        
+                 /*    
         String locale = AppConfig.getInstance().getProperty("user.language").equals("")
                 ? resourcebundle 
                 : resourcebundle + "_" + AppConfig.getInstance().getProperty("user.language");
@@ -143,6 +148,8 @@ public class PanelReportBean extends JPanelReport {
                 ? locale 
                 : locale + "_" + AppConfig.getInstance().getProperty("user.country");    
        */
+        
+        
     }
     
     /**
@@ -172,7 +179,7 @@ public class PanelReportBean extends JPanelReport {
         fieldnames.add(name);
         fielddatas.add(data);
     }
-        
+    
     /**
      *
      * @param name
