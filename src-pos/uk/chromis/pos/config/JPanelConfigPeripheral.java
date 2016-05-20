@@ -234,7 +234,7 @@ public class JPanelConfigPeripheral extends javax.swing.JPanel implements PanelC
 
         // Display
         jcboMachineDisplay.addItem("Not defined");
-        jcboMachineDisplay.addItem("screen");
+        jcboMachineDisplay.addItem("dual screen");
         jcboMachineDisplay.addItem("window");
         jcboMachineDisplay.addItem("javapos");
         jcboMachineDisplay.addItem("epson");
@@ -270,6 +270,7 @@ public class JPanelConfigPeripheral extends javax.swing.JPanel implements PanelC
         jcboMachineScale.addItem("Not defined");
         jcboMachineScale.addItem("screen");
         jcboMachineScale.addItem("casiopd1");
+        jcboMachineScale.addItem("caspdii");
         jcboMachineScale.addItem("dialog1");
         jcboMachineScale.addItem("samsungesp");
         jcboMachineScale.addItem("Adam Equipment");
@@ -529,7 +530,7 @@ public class JPanelConfigPeripheral extends javax.swing.JPanel implements PanelC
         p = new StringParser(AppConfig.getInstance().getProperty("machine.scale"));
         sparam = p.nextToken(':');
         jcboMachineScale.setSelectedItem(sparam);
-        if ("casiopd1".equals(sparam) || "Adam Equipment".equals(sparam) || "dialog1".equals(sparam) || "samsungesp".equals(sparam)) {
+        if ("casiopd1".equals(sparam) || "Adam Equipment".equals(sparam) || "dialog1".equals(sparam) || "samsungesp".equals(sparam) || "caspdii".equals(sparam)) {
             jcboSerialScale.setSelectedItem(p.nextToken(','));
         }
 
@@ -691,6 +692,7 @@ public class JPanelConfigPeripheral extends javax.swing.JPanel implements PanelC
                 break;
             case "screen":
             case "window":
+            case "dual screen":
                 AppConfig.getInstance().setProperty("machine.display", sMachineDisplay);
                 AppConfig.getInstance().setBoolean("machine.customerdisplay", jCustomerScreen.isSelected());
                 break;
@@ -702,7 +704,8 @@ public class JPanelConfigPeripheral extends javax.swing.JPanel implements PanelC
         String sMachineScale = comboValue(jcboMachineScale.getSelectedItem());
         if ("casiopd1".equals(sMachineScale) || "Adam Equipment".equals(sMachineScale)
                 || "dialog1".equals(sMachineScale)
-                || "samsungesp".equals(sMachineScale)) {
+                || "dialog1".equals(sMachineScale)
+                || "caspdii".equals(sMachineScale)) {
             AppConfig.getInstance().setProperty("machine.scale", sMachineScale + ":" + comboValue(jcboSerialScale.getSelectedItem()));
         } else {
             AppConfig.getInstance().setProperty("machine.scale", sMachineScale);
@@ -1023,7 +1026,7 @@ public class JPanelConfigPeripheral extends javax.swing.JPanel implements PanelC
 
         java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("pos_messages"); // NOI18N
         jCustomerScreen.setText(bundle.getString("label.customerscreen")); // NOI18N
-        jPanel2.add(jCustomerScreen, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 0, -1, 30));
+        jPanel2.add(jCustomerScreen, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 0, 250, 30));
 
         m_jDisplayParams.add(jPanel2, "empty");
 
@@ -1878,7 +1881,7 @@ public class JPanelConfigPeripheral extends javax.swing.JPanel implements PanelC
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel13, javax.swing.GroupLayout.DEFAULT_SIZE, 742, Short.MAX_VALUE)
+            .addComponent(jPanel13, javax.swing.GroupLayout.DEFAULT_SIZE, 730, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1991,6 +1994,7 @@ public class JPanelConfigPeripheral extends javax.swing.JPanel implements PanelC
 
         if ("casiopd1".equals(jcboMachineScale.getSelectedItem())
                 || "dialog1".equals(jcboMachineScale.getSelectedItem())
+                || "caspdii".equals(jcboMachineScale.getSelectedItem())
                 || "Adam Equipment".equals(jcboMachineScale.getSelectedItem())
                 || "samsungesp".equals(jcboMachineScale.getSelectedItem())) {
             cl.show(m_jScaleParams, "comm");
@@ -2008,6 +2012,10 @@ public class JPanelConfigPeripheral extends javax.swing.JPanel implements PanelC
             cl.show(m_jDisplayParams, "javapos");
         } else if ("Not defined".equals(jcboMachineDisplay.getSelectedItem())) {
             jCustomerScreen.setVisible(false);
+
+        } else if ("dual screen".equals(jcboMachineDisplay.getSelectedItem())) {
+            cl.show(m_jDisplayParams, "empty");
+            jCustomerScreen.setSelected(true);
         } else {
             jCustomerScreen.setVisible(true);
             cl.show(m_jDisplayParams, "empty");

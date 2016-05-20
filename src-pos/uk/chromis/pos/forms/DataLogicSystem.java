@@ -61,7 +61,7 @@ public class DataLogicSystem extends BeanFactoryDataSingle {
     protected String m_sInitScript;
     private SentenceFind m_version;
     private SentenceExec m_dummy;
-    private String m_dbVersion = "";
+    public static String m_dbVersion = "";
     protected SentenceList m_peoplevisible;
     protected SentenceList m_peoplevisibleByRights;
     protected SentenceFind m_peoplebycard;
@@ -220,15 +220,16 @@ public class DataLogicSystem extends BeanFactoryDataSingle {
             Datas.TIMESTAMP,
             Datas.TIMESTAMP}));
 
-        m_draweropened = new StaticSentence(s, "INSERT INTO DRAWEROPENED ( NAME, TICKETID) "
-                + "VALUES (?, ?)", new SerializerWriteBasic(new Datas[]{
+        m_draweropened = new StaticSentence(s, "INSERT INTO DRAWEROPENED (ID, NAME, TICKETID) "
+                + "VALUES (?, ?, ?)", new SerializerWriteBasic(new Datas[]{
+            Datas.STRING,
             Datas.STRING,
             Datas.STRING}));
 
         m_lineremoved = new StaticSentence(s,
-                "INSERT INTO LINEREMOVED (NAME, TICKETID, PRODUCTID, PRODUCTNAME, UNITS) "
-                + "VALUES (?, ?, ?, ?, ?)",
-                new SerializerWriteBasic(new Datas[]{Datas.STRING, Datas.STRING, Datas.STRING, Datas.STRING, Datas.DOUBLE}));
+                "INSERT INTO LINEREMOVED (ID,NAME, TICKETID, PRODUCTID, PRODUCTNAME, UNITS) "
+                + "VALUES (?, ?, ?, ?, ?, ?)",
+                new SerializerWriteBasic(new Datas[]{Datas.STRING, Datas.STRING, Datas.STRING, Datas.STRING, Datas.STRING, Datas.DOUBLE}));
 
         m_locationfind = new StaticSentence(s, "SELECT NAME FROM LOCATIONS WHERE ID = ?", SerializerWriteString.INSTANCE, SerializerReadString.INSTANCE);
 
@@ -258,8 +259,8 @@ public class DataLogicSystem extends BeanFactoryDataSingle {
             Datas.STRING
         }));
 
-        m_addOrder = new StaticSentence(s, "INSERT INTO ORDERS (ID, ORDERID, QTY, DETAILS, ATTRIBUTES, NOTES, TICKETID, DISPLAYID, AUXILIARY) "
-                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) ", new SerializerWriteBasic(new Datas[]{
+        m_addOrder = new StaticSentence(s, "INSERT INTO ORDERS (ID, ORDERID, QTY, DETAILS, ATTRIBUTES, NOTES, TICKETID, DISPLAYID, AUXILIARY, SEQUENCE) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", new SerializerWriteBasic(new Datas[]{
             Datas.STRING,
             Datas.STRING,
             Datas.INT,
@@ -267,6 +268,7 @@ public class DataLogicSystem extends BeanFactoryDataSingle {
             Datas.STRING,
             Datas.STRING,
             Datas.STRING,
+            Datas.INT,
             Datas.INT,
             Datas.INT
         }));
@@ -519,8 +521,7 @@ public class DataLogicSystem extends BeanFactoryDataSingle {
         m_updatePlaces.exec(x, y, id);
     }
 
-    public final void addOrder(String id, String orderId, Integer qty, String details, String attributes, String notes, String ticketId, Integer displayId, Integer auxiliaryId) throws BasicException {
-        m_addOrder.exec(id, orderId, qty, details, attributes, notes, ticketId, displayId, auxiliaryId);
+    public final void addOrder(String id, String orderId, Integer qty, String details, String attributes, String notes, String ticketId, Integer displayId, Integer auxiliaryId, Integer sequence) throws BasicException {
+        m_addOrder.exec(id, orderId, qty, details, attributes, notes, ticketId, displayId, auxiliaryId, sequence);
     }
-
 }

@@ -19,15 +19,8 @@
 
 package uk.chromis.pos.imports;
 
-/**
- *
- *   
- */
 public class JPanelCSV extends javax.swing.JPanel {
 
-    /**
-     *
-     */
     public JPanelCSV() {
         initComponents();
     }

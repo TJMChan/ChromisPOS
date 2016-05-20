@@ -26,9 +26,11 @@ import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -45,6 +47,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
@@ -77,6 +82,7 @@ import uk.chromis.data.gui.JMessageDialog;
 import uk.chromis.data.gui.MessageInf;
 import uk.chromis.data.loader.Session;
 import uk.chromis.format.Formats;
+import uk.chromis.pos.dialogs.JOpenWarningDlg;
 import uk.chromis.pos.dialogs.JProcessingDlg;
 import uk.chromis.pos.printer.DeviceTicket;
 import uk.chromis.pos.printer.TicketParser;
@@ -124,7 +130,7 @@ public class JRootApp extends JPanel implements AppView {
     private String db_password;
 
     static {
-        initOldClasses();
+        m_oldclasses = new HashMap<>();
     }
 
     private class PrintTimeAction implements ActionListener {
@@ -135,33 +141,71 @@ public class JRootApp extends JPanel implements AppView {
             m_date = getLineDate();
             m_jLblTitle.setText(m_dlSystem.getResourceAsText("Window.Title"));
             jLabel2.setText("  " + m_date + "  " + m_clock);
-            
+
         }
     }
 
     private String getLineTimer() {
-        try {
-            if ((AppConfig.getInstance().getProperty("clock.time") == "") || (AppConfig.getInstance().getProperty("clock.time") == null)) {
-                return Formats.HOURMIN.formatValue(new Date());
-            } else {
-                formatter = new SimpleDateFormat(AppConfig.getInstance().getProperty("clock.time"));
-                return formatter.format(new Date());
-            }
-        } catch (IllegalArgumentException e) {
-            return Formats.HOURMIN.formatValue(new Date());
-        }
+        return Formats.TIME.formatValue(new Date());
     }
 
     private String getLineDate() {
+        return Formats.DATE.formatValue(new Date());
+    }
+
+    private void runRepair() throws SQLException {
+// this routine checks for a repair script in the folder if it is found then it will execute it
+        String s = new String();
+        StringBuffer sb = new StringBuffer();
+
+        db_user = (AppConfig2.getInstance2().getProperty("db.user"));
+        db_url = (AppConfig2.getInstance2().getProperty("db.URL"));
+        db_password = (AppConfig2.getInstance2().getProperty("db.password"));
+        if (db_user != null && db_password != null && db_password.startsWith("crypt:")) {
+            AltEncrypter cypher = new AltEncrypter("cypherkey" + db_user);
+            db_password = cypher.decrypt(db_password.substring(6));
+        }
+
+        FileReader fr;
+        File file;
         try {
-            if ((AppConfig.getInstance().getProperty("clock.date") == "") || (AppConfig.getInstance().getProperty("clock.date") == null)) {
-                return Formats.SIMPLEDATE.formatValue(new Date());
-            } else {
-                formatter = new SimpleDateFormat(AppConfig.getInstance().getProperty("clock.date"));
-                return formatter.format(new Date());
+            file = new File(System.getProperty("user.dir") + "/repair.sql");
+            fr = new FileReader(file);
+        } catch (FileNotFoundException ex) {
+            return;
+        }
+
+        try {
+            ClassLoader cloader = new URLClassLoader(new URL[]{new File(AppConfig2.getInstance2().getProperty("db.driverlib")).toURI().toURL()});
+            DriverManager.registerDriver(new DriverWrapper((Driver) Class.forName(AppConfig2.getInstance2().getProperty("db.driver"), true, cloader).newInstance()));
+            Class.forName(AppConfig2.getInstance2().getProperty("db.driver"));
+            con = DriverManager.getConnection(db_url, db_user, db_password);
+            stmt = (Statement) con.createStatement();
+
+            BufferedReader br = new BufferedReader(fr);
+
+            while ((s = br.readLine()) != null) {
+                sb.append(s);
             }
-        } catch (IllegalArgumentException e) {
-            return Formats.SIMPLEDATE.formatValue(new Date());
+            br.close();
+            String[] inst = sb.toString().split(";");
+
+            for (int i = 0; i < inst.length; i++) {
+                if (!inst[i].trim().equals("")) {
+                    stmt.executeUpdate(inst[i]);
+                    System.out.println(">>" + inst[i]);
+                }
+            }
+            file.delete();
+        } catch (Exception e) {
+            System.out.println("*** Error : " + e.toString());
+            System.out.println("*** ");
+            System.out.println("*** Error : ");
+            e.printStackTrace();
+            System.out.println("################################################");
+            System.out.println(sb.toString());
+        } finally {
+            con.close();
         }
     }
 
@@ -169,6 +213,14 @@ public class JRootApp extends JPanel implements AppView {
      * Creates new form JRootApp
      */
     public JRootApp() {
+
+        try {
+            //Lets check if there is repair script to execute
+            runRepair();
+        } catch (SQLException ex) {
+            Logger.getLogger(JRootApp.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
         // get some default settings 
         db_user = (AppConfig.getInstance().getProperty("db.user"));
         db_url = (AppConfig.getInstance().getProperty("db.URL"));
@@ -185,12 +237,17 @@ public class JRootApp extends JPanel implements AppView {
         jScrollPane1.getVerticalScrollBar().setPreferredSize(new Dimension(30, 30));
     }
 
+    public static final int INIT_SUCCESS = 0;
+    public static final int INIT_FAIL_CONFIG = 1;
+    public static final int INIT_FAIL_EXIT = 2;
+    public static final int INIT_FAIL_RETRY = 3;
+
     /**
      *
      * @param props
      * @return
      */
-    public boolean initApp(AppProperties props) {
+    public int initApp(AppProperties props) {
 
         m_props = props;
         m_jPanelDown.setVisible(!AppConfig.getInstance().getBoolean("till.hideinfo"));
@@ -199,11 +256,21 @@ public class JRootApp extends JPanel implements AppView {
         applyComponentOrientation(ComponentOrientation.getOrientation(Locale.getDefault()));
 
         // Database start
-        try {
-            session = AppViewConnection.createSession(m_props);
-        } catch (BasicException e) {
-            JMessageDialog.showMessage(this, new MessageInf(MessageInf.SGN_DANGER, e.getMessage(), e));
-            return false;
+        int rc = INIT_FAIL_RETRY;
+        while (rc == INIT_FAIL_RETRY) {
+            rc = INIT_SUCCESS;
+            try {
+                session = AppViewConnection.createSession(m_props);
+            } catch (BasicException e) {
+                JOpenWarningDlg wDlg = new JOpenWarningDlg(e.getMessage(), AppLocal.getIntString("message.retryorconfig"), true, true);
+                wDlg.setModal(true);
+                wDlg.setVisible(true);
+                rc = JOpenWarningDlg.CHOICE;
+            }
+        }
+
+        if (rc != INIT_SUCCESS) {
+            return rc;
         }
 
         m_dlSystem = (DataLogicSystem) getBean("uk.chromis.pos.forms.DataLogicSystem");
@@ -232,23 +299,29 @@ public class JRootApp extends JPanel implements AppView {
             if (getDbVersion().equals("x")) {
                 JMessageDialog.showMessage(this, new MessageInf(MessageInf.SGN_DANGER,
                         AppLocal.getIntString("message.databasenotsupported", session.DB.getName())));
-            } else {
+            } else {              
                 String changelog = (sDBVersion == null) || ("0.00".equals(sDBVersion))
-                        ? "uk/chromis/pos/liquibase/chromis.xml"
-                        : "uk/chromis/pos/liquibase/updatesystem.xml";              
-                JProcessingDlg dlg = new JProcessingDlg( AppLocal.getIntString(sDBVersion == null ? "message.createdatabase" : "message.updatedatabase"),(sDBVersion == null ? true : false), changelog);
+                        ? "uk/chromis/pos/liquibase/create/chromis.xml"
+                        : "uk/chromis/pos/liquibase/upgradeorig/updatesystem.xml";                
+                JProcessingDlg dlg = new JProcessingDlg(AppLocal.getIntString(sDBVersion == null ? "message.createdatabase" : "message.updatedatabase"), (sDBVersion == null), changelog);
                 dlg.setModal(true);
                 dlg.setVisible(true);
-                if (dlg.CHOICE == -1 || dlg.DBFAILED) {
+                if (JProcessingDlg.CHOICE == -1 || JProcessingDlg.DBFAILED) {
                     session.close();
-                    return false;
+                    JOpenWarningDlg wDlg;
+                    if (!"".equals(JProcessingDlg.ERRORMSG)) {
+                        wDlg = new JOpenWarningDlg(JProcessingDlg.ERRORMSG, AppLocal.getIntString(sDBVersion == null ? "message.createfailure" : "message.updatefailure"), false, false);
+                        wDlg.setModal(true);
+                        wDlg.setVisible(true);
+                    } 
+                    System.exit(0);
                 }
             }
         }
 
 // Clear the cash drawer table as required, by setting 
         try {
-            if (getDbVersion() == "d") {
+            if ("d".equals(getDbVersion())) {
                 SQL = "DELETE FROM DRAWEROPENED WHERE OPENDATE < {fn TIMESTAMPADD(SQL_TSI_DAY ,-" + AppConfig.getInstance().getProperty("dbtable.retaindays") + ", CURRENT_TIMESTAMP)}";
             } else {
                 SQL = "DELETE FROM DRAWEROPENED WHERE OPENDATE < (NOW() - INTERVAL '" + AppConfig.getInstance().getProperty("dbtable.retaindays") + "' DAY)";
@@ -265,24 +338,20 @@ public class JRootApp extends JPanel implements AppView {
                     ? null
                     : m_dlSystem.findActiveCash(sActiveCashIndex);
             if (valcash == null || !AppConfig.getInstance().getHost().equals(valcash[0])) {
-                // no la encuentro o no es de mi host por tanto creo una...
                 setActiveCash(UUID.randomUUID().toString(), m_dlSystem.getSequenceCash(AppConfig.getInstance().getHost()) + 1, new Date(), null);
-
-                // creamos la caja activa      
                 m_dlSystem.execInsertCash(
-                        new Object[]{getActiveCashIndex(), AppConfig.getInstance().getHost(), getActiveCashSequence(), getActiveCashDateStart(), getActiveCashDateEnd()});
+                        new Object[]{getActiveCashIndex(), AppConfig.getInstance().getHost(), getActiveCashSequence(), getActiveCashDateStart(), getActiveCashDateEnd(), 0});
             } else {
                 setActiveCash(sActiveCashIndex, (Integer) valcash[1], (Date) valcash[2], (Date) valcash[3]);
             }
         } catch (BasicException e) {
-            // Casco. Sin caja no hay pos
-            MessageInf msg = new MessageInf(MessageInf.SGN_NOTICE, AppLocal.getIntString("message.cannotclosecash"), e);
-            msg.show(this);
             session.close();
-            return false;
+            JOpenWarningDlg wDlg = new JOpenWarningDlg(e.getMessage(), AppLocal.getIntString("message.retryorconfig"), false, true);
+            wDlg.setModal(true);
+            wDlg.setVisible(true);
+            return JOpenWarningDlg.CHOICE;
         }
 
-        // Leo la localizacion de la caja (Almacen).
         m_sInventoryLocation = m_propsdb.getProperty("location");
         if (m_sInventoryLocation
                 == null) {
@@ -411,7 +480,7 @@ public class JRootApp extends JPanel implements AppView {
 
         showLogin();
 
-        return true;
+        return INIT_SUCCESS;
     }
 
     private class doWork implements Runnable {
@@ -562,6 +631,7 @@ public class JRootApp extends JPanel implements AppView {
                     } else {
                         // the old construction for beans...
                         Constructor constMyView = bfclass.getConstructor(new Class[]{AppView.class
+
                         });
                         Object bean = constMyView.newInstance(new Object[]{this});
 
@@ -589,32 +659,6 @@ public class JRootApp extends JPanel implements AppView {
         return newclass == null
                 ? classname
                 : newclass;
-    }
-
-    private static void initOldClasses() {
-
-        m_oldclasses = new HashMap<>();
-        /*
-        // update bean names from 2.00 to 2.20    
-        m_oldclasses.put("uk.chromis.pos.reports.JReportCustomers", "/uk/chromis/reports/customers.bs");
-        m_oldclasses.put("uk.chromis.pos.reports.JReportCustomersB", "/uk/chromis/reports/customersb.bs");
-        m_oldclasses.put("uk.chromis.pos.reports.JReportClosedPos", "/uk/chromis/reports/closedpos.bs");
-        m_oldclasses.put("uk.chromis.pos.reports.JReportClosedProducts", "/uk/chromis/reports/closedproducts.bs");
-        m_oldclasses.put("uk.chromis.pos.reports.JChartSales", "/uk/chromis/reports/chartsales.bs");
-        m_oldclasses.put("uk.chromis.pos.reports.JReportInventory", "/uk/chromis/reports/inventory.bs");
-        m_oldclasses.put("uk.chromis.pos.reports.JReportInventory2", "/uk/chromis/reports/inventoryb.bs");
-        m_oldclasses.put("uk.chromis.pos.reports.JReportInventoryBroken", "/uk/chromis/reports/inventorybroken.bs");
-        m_oldclasses.put("uk.chromis.pos.reports.JReportInventoryDiff", "/uk/chromis/reports/inventorydiff.bs");
-        m_oldclasses.put("uk.chromis.pos.reports.JReportInventoryReOrder", "/uk/chromis/reports/inventoryreorder.bs");
-        m_oldclasses.put("uk.chromis.pos.reports.JReportPeople", "/uk/chromis/reports/people.bs");
-        m_oldclasses.put("uk.chromis.pos.reports.JReportTaxes", "/uk/chromis/reports/taxes.bs");
-        m_oldclasses.put("uk.chromis.pos.reports.JReportUserSales", "/uk/chromis/reports/usersales.bs");
-        m_oldclasses.put("uk.chromis.pos.reports.JReportProducts", "/uk/chromis/reports/products.bs");
-        m_oldclasses.put("uk.chromis.pos.reports.JReportCatalog", "/uk/chromis/reports/productscatalog.bs");
- 
-        // update bean names from 2.10 to 2.20
-        m_oldclasses.put("uk.chromis.pos.panels.JPanelTax", "uk.chromis.pos.inventory.TaxPanel");
-         */
     }
 
     /**
@@ -679,6 +723,7 @@ public class JRootApp extends JPanel implements AppView {
                 jPeople.add(btn);
             }
             jScrollPane1.getViewport().setView(jPeople);
+
         } catch (BasicException ee) {
         }
     }
@@ -878,7 +923,8 @@ public class JRootApp extends JPanel implements AppView {
 
         jLabel2.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
         jLabel2.setForeground(new java.awt.Color(102, 102, 102));
-        jLabel2.setPreferredSize(new java.awt.Dimension(180, 34));
+        jLabel2.setPreferredSize(new java.awt.Dimension(280, 34));
+        jLabel2.setRequestFocusEnabled(false);
         m_jPanelTitle.add(jLabel2, java.awt.BorderLayout.LINE_START);
 
         add(m_jPanelTitle, java.awt.BorderLayout.NORTH);
@@ -896,7 +942,7 @@ public class JRootApp extends JPanel implements AppView {
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/uk/chromis/fixedimages/chromis.png"))); // NOI18N
         jLabel1.setText("<html><center>Chromis POS - The New Face of open source POS<br>" +
-            "Copyright \u00A9 (c) 2015-2016Chromis <br>" +
+            "Copyright \u00A9 2015 Chromis <br>" +
             "http://www.chromis.co.uk<br>" +
             "<br>" +
             "Chromis POS is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.<br>" +

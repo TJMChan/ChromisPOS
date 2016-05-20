@@ -237,6 +237,29 @@ public abstract class JPaymentSelect extends javax.swing.JDialog
         }
     }
 
+    public class JPaymentCustomCreator implements JPaymentCreator {
+
+        @Override
+        public JPaymentInterface createJPayment() {
+            return new JPaymentCustom(JPaymentSelect.this, "customin", dlSystem);
+        }
+
+        @Override
+        public String getKey() {
+            return "payment.custom";
+        }
+
+        @Override
+        public String getLabelKey() {
+            return "tab.custom";
+        }
+
+        @Override
+        public String getIconKey() {
+            return "/uk/chromis/images/voucher.png";
+        }
+    }
+
     public class JPaymentMagcardCreator implements JPaymentCreator {
 
         @Override
@@ -367,6 +390,29 @@ public abstract class JPaymentSelect extends javax.swing.JDialog
         @Override
         public String getLabelKey() {
             return "tab.paper";
+        }
+
+        @Override
+        public String getIconKey() {
+            return "/uk/chromis/images/voucher.png";
+        }
+    }
+
+    public class JPaymentCustomRefundCreator implements JPaymentCreator {
+
+        @Override
+        public JPaymentInterface createJPayment() {
+            return new JPaymentRefund(JPaymentSelect.this, "customout");
+        }
+
+        @Override
+        public String getKey() {
+            return "refund.custom";
+        }
+
+        @Override
+        public String getLabelKey() {
+            return "tab.custom";
         }
 
         @Override
@@ -624,6 +670,9 @@ public abstract class JPaymentSelect extends javax.swing.JDialog
 
         PaymentInfo returnPayment = ((JPaymentInterface) m_jTabPayment.getSelectedComponent()).executePayment();
 
+        
+        
+        
         double change = AppConfig.getInstance().getDouble("till.changelimit");
         if (returnPayment.getChange() > change && AppConfig.getInstance().getBoolean("till.enablechangelimit")) {
             Toolkit.getDefaultToolkit().beep();
@@ -634,6 +683,8 @@ public abstract class JPaymentSelect extends javax.swing.JDialog
             addTabs();
         } else if (returnPayment != null) {
             m_aPaymentInfo.add(returnPayment);
+            // always ensure cash is last in the list for payment
+            m_aPaymentInfo.sortPayments(m_dTotal);
             accepted = true;
 
             dispose();

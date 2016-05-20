@@ -59,14 +59,9 @@ public class ProductFilter extends javax.swing.JPanel implements ReportEditorCre
     public void init(AppView app) {
 
         DataLogicSales dlSales = (DataLogicSales) app.getBean("uk.chromis.pos.forms.DataLogicSales");
-
-        // El modelo de categorias
         m_sentcat = dlSales.getCategoriesList();
         m_CategoryModel = new ComboBoxValModel();
 
-//        m_jCboName.setModel(new ListQBFModelNumber());
-//        m_jCboPriceBuy.setModel(new ListQBFModelNumber());
-//        m_jCboPriceSell.setModel(new ListQBFModelNumber());
         m_jCboName.setModel(ListQBFModelNumber.getMandatoryString());
         m_jCboPriceBuy.setModel(ListQBFModelNumber.getMandatoryNumber());
         m_jCboPriceSell.setModel(ListQBFModelNumber.getMandatoryNumber());
@@ -80,7 +75,7 @@ public class ProductFilter extends javax.swing.JPanel implements ReportEditorCre
     public void activate() throws BasicException {
 
         List catlist = m_sentcat.list();
-        catlist.add(0, null);
+        catlist.add(0, null);       
         m_CategoryModel = new ComboBoxValModel(catlist);
         m_jCategory.setModel(m_CategoryModel);
     }
@@ -117,11 +112,10 @@ public class ProductFilter extends javax.swing.JPanel implements ReportEditorCre
                 m_jCboName.getSelectedItem(), m_jName.getText(),
                 m_jCboPriceBuy.getSelectedItem(), Formats.CURRENCY.parseValue(m_jPriceBuy.getText()),
                 m_jCboPriceSell.getSelectedItem(), Formats.CURRENCY.parseValue(m_jPriceSell.getText()),
-                m_CategoryModel.getSelectedKey() == null ? QBFCompareEnum.COMP_NONE : QBFCompareEnum.COMP_EQUALS, m_CategoryModel.getSelectedKey(),
+                m_CategoryModel.getSelectedKey() == null ? QBFCompareEnum.COMP_ISNOTNULL : QBFCompareEnum.COMP_EQUALS, m_CategoryModel.getSelectedKey(),
                 QBFCompareEnum.COMP_NONE, null
             };
         } else {
-            // Filtro por codigo de barras.
             return new Object[]{
                 QBFCompareEnum.COMP_NONE, null,
                 QBFCompareEnum.COMP_NONE, null,

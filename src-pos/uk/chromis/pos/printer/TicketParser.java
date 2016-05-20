@@ -28,6 +28,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.UUID;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
@@ -180,9 +181,8 @@ public class TicketParser extends DefaultHandler {
                         m_printer.getDevicePrinter(readString(attributes.getValue("printer"), "1")).openDrawer();
                         // Cashdrawer has been activated record the data in the table
                         try {
-                            m_system.execDrawerOpened(
-                                    //new Object[] {df.format(dNow),cUser,ticketId});
-                                    new Object[]{cUser, ticketId});
+                            m_system.execDrawerOpened(                                    
+                                    new Object[]{UUID.randomUUID().toString(), cUser, ticketId});
                         } catch (BasicException ex) {
                         }
                         break;
