@@ -251,6 +251,8 @@ public class JCatalog extends JPanel implements ListSelectionListener, CatalogSe
     }
 
     private void selectCategoryPanel(String catid) {
+        //System.out.println("Start Count");
+        //startTime = System.nanoTime();
         try {
             // Load categories panel if not exists
             if (!m_categoriesset.contains(catid)) {
@@ -267,8 +269,6 @@ public class JCatalog extends JPanel implements ListSelectionListener, CatalogSe
                 } else {
                     categories = m_dlSales.getSubcategories(catid);
                 }
-
-                //            startTime = System.nanoTime();
                 for (CategoryInfo cat : categories) {
 // these the sub categories displayed in the main products Panel    
 
@@ -300,9 +300,9 @@ public class JCatalog extends JPanel implements ListSelectionListener, CatalogSe
             JMessageDialog.showMessage(this, new MessageInf(MessageInf.SGN_WARNING, AppLocal.getIntString("message.notactive"), e));
         }
 
-        //       Long elapsedTime = System.nanoTime() - startTime;
-        //       double seconds = (double)elapsedTime / 1000000000.0;
-        //       System.out.println("Time take = " + seconds);
+        // Long elapsedTime = System.nanoTime() - startTime;
+        // double seconds = (double)elapsedTime / 1000000000.0;
+        // System.out.println("Time take = " + seconds);
     }
 
     private String getProductLabel(ProductInfoExt product) {
