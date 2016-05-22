@@ -178,7 +178,7 @@ public final class Session {
 
         boolean bclosed;
         try {
-            bclosed = m_c == null || m_c.isClosed() ||  m_c.createStatement().execute("SELECT \"TEST Connection\"");
+            bclosed = m_c == null || m_c.isClosed() || !m_c.createStatement().execute("SELECT \"TEST Connection\"");
         } catch (SQLException e) {
             bclosed = true;
         }
