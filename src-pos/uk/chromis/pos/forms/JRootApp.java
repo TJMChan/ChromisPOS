@@ -47,9 +47,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
@@ -90,6 +87,7 @@ import uk.chromis.pos.printer.TicketPrinterException;
 import uk.chromis.pos.scale.DeviceScale;
 import uk.chromis.pos.scanpal2.DeviceScanner;
 import uk.chromis.pos.scanpal2.DeviceScannerFactory;
+import uk.chromis.pos.sync.Sync;
 import uk.chromis.pos.util.AltEncrypter;
 import uk.chromis.pos.util.OSValidator;
 
@@ -158,9 +156,9 @@ public class JRootApp extends JPanel implements AppView {
         String s = new String();
         StringBuffer sb = new StringBuffer();
 
-        db_user = (AppConfig2.getInstance2().getProperty("db.user"));
-        db_url = (AppConfig2.getInstance2().getProperty("db.URL"));
-        db_password = (AppConfig2.getInstance2().getProperty("db.password"));
+        db_user = (AppConfig.getInstance().getProperty("db.user"));
+        db_url = (AppConfig.getInstance().getProperty("db.URL"));
+        db_password = (AppConfig.getInstance().getProperty("db.password"));
         if (db_user != null && db_password != null && db_password.startsWith("crypt:")) {
             AltEncrypter cypher = new AltEncrypter("cypherkey" + db_user);
             db_password = cypher.decrypt(db_password.substring(6));
@@ -176,9 +174,9 @@ public class JRootApp extends JPanel implements AppView {
         }
 
         try {
-            ClassLoader cloader = new URLClassLoader(new URL[]{new File(AppConfig2.getInstance2().getProperty("db.driverlib")).toURI().toURL()});
-            DriverManager.registerDriver(new DriverWrapper((Driver) Class.forName(AppConfig2.getInstance2().getProperty("db.driver"), true, cloader).newInstance()));
-            Class.forName(AppConfig2.getInstance2().getProperty("db.driver"));
+            ClassLoader cloader = new URLClassLoader(new URL[]{new File(AppConfig.getInstance().getProperty("db.driverlib")).toURI().toURL()});
+            DriverManager.registerDriver(new DriverWrapper((Driver) Class.forName(AppConfig.getInstance().getProperty("db.driver"), true, cloader).newInstance()));
+            Class.forName(AppConfig.getInstance().getProperty("db.driver"));
             con = DriverManager.getConnection(db_url, db_user, db_password);
             stmt = (Statement) con.createStatement();
 
@@ -351,13 +349,13 @@ public class JRootApp extends JPanel implements AppView {
             wDlg.setVisible(true);
             return JOpenWarningDlg.CHOICE;
         }
-
+        
         m_sInventoryLocation = m_propsdb.getProperty("location");
         if (m_sInventoryLocation
                 == null) {
             m_sInventoryLocation = "0";
             m_propsdb.setProperty("location", m_sInventoryLocation);
-            m_dlSystem.setResourceAsProperties(AppConfig.getInstance().getHost() + "/properties", m_propsdb);
+            m_dlSystem.setResourceAsProperties(AppConfig.getInstance().getHost() + "/properties", m_propsdb);           
         }
 
         // setup the display
@@ -613,39 +611,31 @@ public class JRootApp extends JPanel implements AppView {
     public Object getBean(String beanfactory) throws BeanFactoryException {
         // For backwards compatibility
         beanfactory = mapNewClass(beanfactory);
-
         BeanFactory bf = m_aBeanFactories.get(beanfactory);
         if (bf == null) {
             // testing sripts
             if (beanfactory.startsWith("/")) {
                 bf = new BeanFactoryScript(beanfactory);
             } else {
-                // Class BeanFactory
                 try {
                     Class bfclass = Class.forName(beanfactory);
 
                     if (BeanFactory.class
                             .isAssignableFrom(bfclass)) {
                         bf = (BeanFactory) bfclass.newInstance();
-
                     } else {
                         // the old construction for beans...
                         Constructor constMyView = bfclass.getConstructor(new Class[]{AppView.class
-
                         });
                         Object bean = constMyView.newInstance(new Object[]{this});
-
                         bf = new BeanFactoryObj(bean);
                     }
-
                 } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | NoSuchMethodException | SecurityException | IllegalArgumentException | InvocationTargetException e) {
                     throw new BeanFactoryException(e);
                 }
             }
-
             // cache the factory
             m_aBeanFactories.put(beanfactory, bf);
-
             // Initialize if it is a BeanFactoryApp
             if (bf instanceof BeanFactoryApp) {
                 ((BeanFactoryApp) bf).init(this);
@@ -1094,7 +1084,7 @@ public class JRootApp extends JPanel implements AppView {
                 DriverManager.registerDriver(new DriverWrapper((Driver) Class.forName(AppConfig.getInstance().getProperty("db.driver"), true, cloader).newInstance()));
                 Class.forName(AppConfig.getInstance().getProperty("db.driver"));
                 con = DriverManager.getConnection(db_url, db_user, db_password);
-                PreparedStatement stmt = con.prepareStatement("INSERT INTO PEOPLE (ID, NAME, ROLE, VISIBLE) VALUES ('99', 'SuperAdminUser', '0', 0)");
+                PreparedStatement stmt = con.prepareStatement("INSERT INTO PEOPLE (ID, NAME, ROLE, VISIBLE) VALUES ('99', 'SuperAdminUser', '0', true)");
                 stmt.executeUpdate();
                 user = m_dlSystem.getsuperuser();
 
@@ -1174,6 +1164,7 @@ public class JRootApp extends JPanel implements AppView {
         model.addRow(new Object[]{"Java Version", System.getProperty("java.version")});
         model.addRow(new Object[]{"Jar MD5", md5});
         model.addRow(new Object[]{"Operating System", System.getProperty("os.name")});
+        model.addRow(new Object[]{"Sync library", Sync.getVersion()});
 
         JScrollPane scrollPane = new JScrollPane(table);
         JPanel mainPanel = new JPanel(layout);

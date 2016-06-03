@@ -45,21 +45,7 @@
             <append value=" ENGINE = InnoDB DEFAULT CHARSET=utf8  "/>
         </modifySql>                        
     </changeSet>   
-   
-    <changeSet author="Chromis POS" id="Create Index in dbpermissions Table (NV)">   
-        <preConditions onFail="MARK_RAN">
-            <not>
-                <indexExists tableName="DBPERMISSIONS" columnNames="CLASSNAME"/>    
-            </not>
-        </preConditions>  
-          
-        <createIndex tableName="DBPERMISSIONS"
-                     indexName="DBPERMISSIONS_CLASSNAME_INX"
-                     unique="true">
-            <column name="CLASSNAME" type="varchar(255)"/>
-        </createIndex>    
-    </changeSet>  
-     
+         
     <changeSet author="Chromis POS" id="Insert into Permissions Table (NV)">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">SELECT COUNT(*) FROM DBPERMISSIONS</sqlCheck>
@@ -1022,6 +1008,18 @@
             <column name="DESCRIPTION" value="##label.description132"/>  
         </insert>		  
     </changeSet>     
+    
+    <changeSet author="Chromis POS" id="Add unlock tables option (NV)">      
+        <preConditions onFail="MARK_RAN">  
+            <sqlCheck expectedResult="0">SELECT COUNT(1) FROM DBPERMISSIONS WHERE DESCRIPTION = '##label.description133'</sqlCheck>  
+        </preConditions> 
+        <insert tableName="DBPERMISSIONS">
+            <column name="CLASSNAME" value="uk.chromis.pos.sales.JPanelUnlockTables"/>  
+            <column name="SECTION" value="##label.sectionmaintenance"/>
+            <column name="DISPLAYNAME" value="##label.displayname133"/>  
+            <column name="DESCRIPTION" value="##label.description133"/>  
+        </insert> 		  
+    </changeSet> 
     
  
     <changeSet author="Chromis POS" id="drop top10salesMysql (NV)">   

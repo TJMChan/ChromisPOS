@@ -75,31 +75,50 @@ public class DrawerOpenedGUID implements liquibase.change.custom.CustomTaskChang
         } catch (MalformedURLException | SQLException | ClassNotFoundException | InstantiationException | IllegalAccessException ex) {
             Logger.getLogger(SiteGUID.class.getName()).log(Level.SEVERE, null, ex);
         }
+        /*
+         -                 String SQL2 = "INSERT INTO LINEREMOVED (ID, REMOVEDDATE, NAME, TICKETID, PRODUCTID, PRODUCTNAME, UNITS) VALUES (?, ?, ?, ?, ?, ?, ?)";
+ -                 pstmt = conn.prepareStatement(SQL2);
+ -                 pstmt.setString(1, UUID.randomUUID().toString());
+ -                 pstmt.setTimestamp(2, rs.getTimestamp("REMOVEDDATE"));
+ -                 pstmt.setString(3, rs.getString("NAME"));
+ -                 pstmt.setString(4, rs.getString("TICKETID"));
+ -                 pstmt.setString(5, rs.getString("PRODUCTID"));
+ -                 pstmt.setString(6, rs.getString("PRODUCTNAME"));
+ -                 pstmt.setDouble(7, rs.getDouble("UNITS"));
+ -                 pstmt.executeUpdate();
 
+         */
         try {
-            Statement stmt = (Statement) conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            Statement stmt = (Statement) conn.createStatement();
 
-            String SQL = "SELECT * FROM DRAWEROPENED";
-            rs = stmt.executeQuery(SQL);
-
+            int count = 0;
+            rs = stmt.executeQuery("SELECT COUNT(*) FROM DRAWEROPENED");
             while (rs.next()) {
-                String SQL2 = "INSERT INTO DRAWEROPENED (ID, OPENDATE, NAME, TICKETID) VALUES (?, ?, ?, ?)";
-                pstmt = conn.prepareStatement(SQL2);
-                pstmt.setString(1, UUID.randomUUID().toString());
-                pstmt.setTimestamp(2, rs.getTimestamp("OPENDATE"));
-                pstmt.setString(3, rs.getString("NAME"));
-                pstmt.setString(4, rs.getString("TICKETID"));
-                pstmt.executeUpdate();
+                count = rs.getInt(1);
             }
 
-            SQL = "DELETE FROM DRAWEROPENED WHERE ID = ''";
-            pstmt = conn.prepareStatement(SQL);
+            if (count > 0) {
+                rs = stmt.executeQuery("SELECT * FROM DRAWEROPENED");
+                int j = 1;
+                while (rs.next()) {
+                    if (j <= count) {
+                        String SQL2 = "INSERT INTO DRAWEROPENED (ID, OPENDATE, NAME, TICKETID) VALUES (?, ?, ?, ?)";
+                        pstmt = conn.prepareStatement(SQL2);
+                        pstmt.setString(1, UUID.randomUUID().toString());
+                        pstmt.setTimestamp(2, rs.getTimestamp("OPENDATE"));
+                        pstmt.setString(3, rs.getString("NAME"));
+                        pstmt.setString(4, rs.getString("TICKETID"));
+                        pstmt.executeUpdate();
+                        j++;
+                    }
+                }
+            }
+
+            pstmt = conn.prepareStatement("DELETE FROM DRAWEROPENED WHERE ID = ''");
             pstmt.executeUpdate();
 
-            SQL = "DELETE FROM DRAWEROPENED WHERE ID IS NULL";
-            pstmt = conn.prepareStatement(SQL);
+            pstmt = conn.prepareStatement("DELETE FROM DRAWEROPENED WHERE ID IS NULL");
             pstmt.executeUpdate();
-
             conn.close();
         } catch (SQLException ex) {
             Logger.getLogger(SiteGUID.class.getName()).log(Level.SEVERE, null, ex);

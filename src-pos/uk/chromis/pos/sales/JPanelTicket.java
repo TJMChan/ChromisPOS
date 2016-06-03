@@ -1172,13 +1172,17 @@ public abstract class JPanelTicket extends JPanel implements JPanelView, BeanFac
 
                         if (sCode.length() == 13) {
                             sVariableTypePrefix = sCode.substring(0, 2);
-                            sVariableNum = sCode.substring(8, 12);
-                            prodCode = sCode.replace(sCode.substring(7, sCode.length() - 1), "00000");
+                            //sVariableNum = sCode.substring(8, 12);
+                            sVariableNum = sCode.substring(7, 12);
+                            //prodCode = sCode.replace(sCode.substring(7, sCode.length() - 1), "00000");
+                            prodCode = sCode.replace(sCode.substring(6, sCode.length() - 1), "000000");
                             prodCode = prodCode.substring(0, sCode.length() - 1);
                         } else {
                             sVariableTypePrefix = sCode.substring(0, 2);;
-                            sVariableNum = sCode.substring(7, 11);
-                            prodCode = sCode.replace(sCode.substring(6, sCode.length() - 1), "00000");
+                            //sVariableNum = sCode.substring(7, 11);
+                            sVariableNum = sCode.substring(6, 11);
+                            //prodCode = sCode.replace(sCode.substring(6, sCode.length() - 1), "00000");
+                            prodCode = sCode.replace(sCode.substring(5, sCode.length() - 1), "000000");
                             prodCode = prodCode.substring(0, sCode.length() - 1);
                         }
                         if (sCode.length() == 13) {
@@ -1529,7 +1533,6 @@ public abstract class JPanelTicket extends JPanel implements JPanelView, BeanFac
                                 JRefundLines.updateRefunds();
                             } catch (BasicException ex) {
                                 //  Logger.getLogger(JPanelTicket.class.getName()).log(Level.SEVERE, null, ex);
-                                System.out.println();
                             }
                         }
                         m_ticketsbag.deleteTicket();
@@ -1598,8 +1601,7 @@ public abstract class JPanelTicket extends JPanel implements JPanelView, BeanFac
                                 for (TicketLineInfo line : m_oTicket.getLines()) {
                                     if ((line.getProperty("vCode") != "") && (line.getProperty("vCode") != null)) {
                                         try {
-                                            dlSales.sellVoucher(
-                                                    new Object[]{line.getProperty("vCode"), Integer.toString(ticket.getTicketId())});
+                                            dlSales.sellVoucher(new Object[]{line.getProperty("vCode"), Integer.toString(ticket.getTicketId())});
                                         } catch (BasicException ex) {
                                         }
                                     }
