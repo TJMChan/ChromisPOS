@@ -405,6 +405,23 @@
         <sql>CREATE INDEX TICKETS_TICKETID ON TICKETS (TICKETTYPE, TICKETID)</sql>        
     </changeSet>
   
+    <changeSet author="Chromis POS" id="Fix - Drop unique lEAVES_PPLID Index (TESTED)" dbms="mysql">
+        <preConditions onFail="MARK_RAN">
+            <indexExists tableName="LEAVES" indexName="lEAVES_PPLID"/>        
+        </preConditions>  
+        <sql>ALTER TABLE LEAVES DROP FOREIGN KEY LEAVES_PPLID</sql>        
+        <sql>ALTER TABLE LEAVES DROP INDEX lEAVES_PPLID</sql>        
+        <sql>CREATE INDEX LEAVES_PPLID ON LEAVES (PPLID)</sql>        
+        <sql>ALTER TABLE LEAVES ADD CONSTRAINT LEAVES_PPLID FOREIGN KEY (PPLID) REFERENCES PEOPLE(ID)</sql>
+    </changeSet>
+
+    <changeSet author="Chromis POS" id="Fix - Drop unique lEAVES_PPLID Index (UNTESTED)" dbms="derby, postgresql">
+        <preConditions onFail="MARK_RAN">
+            <indexExists tableName="LEAVES" indexName="lEAVES_PPLID"/>        
+        </preConditions>  
+        <sql>DROP INDEX lEAVES_PPLID</sql>        
+    </changeSet>
+
     <changeSet author="Chromis POS" id="Add LEAVES_PPLID Index (NV)">
         <preConditions onFail="MARK_RAN">
             <not>
