@@ -298,7 +298,7 @@ public class DataLogicSales extends BeanFactoryDataSingle {
         m_dlSystem.init(s);
         Properties m_propsdb = m_dlSystem.getResourceAsProperties(AppConfig.getInstance().getHost() + "/properties");
 
-        Object[] record = (Object[]) new StaticSentence(s, "SELECT UNITS FROM STOCKCURRENT WHERE  LOCATION = " + m_propsdb.getProperty("location") + " AND PRODUCT = ? ", SerializerWriteString.INSTANCE, new SerializerReadBasic(new Datas[]{Datas.STRING})).find(id);
+        Object[] record = (Object[]) new StaticSentence(s, "SELECT UNITS FROM STOCKCURRENT WHERE  LOCATION = '" + m_propsdb.getProperty("location") + "' AND PRODUCT = ? ", SerializerWriteString.INSTANCE, new SerializerReadBasic(new Datas[]{Datas.STRING})).find(id);
         return record == null ? "0.0" : (String) record[0];
     }
 
@@ -591,7 +591,7 @@ public class DataLogicSales extends BeanFactoryDataSingle {
                 + "P.ISVERPATRIB, "
                 + "P.TEXTTIP, "
                 + "P.WARRANTY, "
-                + "( SELECT UNITS FROM STOCKCURRENT WHERE  LOCATION = " + m_propsdb.getProperty("location") + " AND PRODUCT = P.ID ), "
+                + "( SELECT UNITS FROM STOCKCURRENT WHERE  LOCATION = '" + m_propsdb.getProperty("location") + "' AND PRODUCT = P.ID ), "
                 + "P.ALIAS, "
                 + "P.ALWAYSAVAILABLE, "
                 + "P.DISCOUNTED, "
