@@ -22,6 +22,7 @@ package uk.chromis.data.loader;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.Date;
 
 /**
  *
@@ -31,13 +32,19 @@ import java.sql.SQLException;
  */
 public final class Session {
     
+    // Interval of Idle time(ms) before next test
+    private static long INTERVAL = 2*60*1000;
+    
     private final String m_surl;
     private final String m_sappuser;
     private final String m_spassword;
     
     private Connection m_c;
     private boolean m_bInTransaction;
-
+    private Date m_date;
+    private long m_lastTime;
+    
+    
     /**
      *
      */
@@ -57,7 +64,9 @@ public final class Session {
         m_bInTransaction = false;
         
         connect(); // no lazy connection
-
+        
+        m_date = new Date();
+        m_lastTime = m_date.getTime();
         DB = getDiff();
     }
     
@@ -168,7 +177,7 @@ public final class Session {
         
         boolean bclosed;
         try {
-            bclosed = m_c == null || m_c.isClosed() || m_c.createStatement().execute("SELECT \"TEST Connection\"");
+            bclosed = m_c == null || m_c.isClosed() || checkConnection() ;
         } catch (SQLException e) {
             bclosed = true;
         }
@@ -179,6 +188,24 @@ public final class Session {
         }
     }  
 
+    /**
+     * If not time for next check return false
+     */
+    private boolean checkConnection() throws SQLException {
+        long lastTime = m_lastTime;
+        
+        m_date = new Date();
+        m_lastTime = m_date.getTime();
+        
+        // Test connection only after an INTERVAL of idle time. 
+        if(m_date.getTime()>(lastTime+INTERVAL)) {
+            if(!m_c.createStatement().execute("SELECT \"TEST Connection\""))
+                return true;
+        }
+        
+        return false;
+    }
+    
     /**
      *
      * @return

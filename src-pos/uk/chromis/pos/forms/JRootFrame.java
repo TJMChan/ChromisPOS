@@ -84,7 +84,11 @@ public class JRootFrame extends javax.swing.JFrame implements AppMessage {
             
             setVisible(true);                        
         } else {
-            new JFrmConfig(props).setVisible(true); // Show the configuration window.
+            if(!AppConfig.getInstance().getBoolean("machine.disableconfigonDBerror")) {
+                new JFrmConfig(props).setVisible(true); // Show the configuration window.
+            } else {
+                System.exit(1);
+            }
         }
     }
     
