@@ -260,7 +260,7 @@ public class JRootApp extends JPanel implements AppView {
             try {
                 session = AppViewConnection.createSession(m_props);
             } catch (BasicException e) {
-                JOpenWarningDlg wDlg = new JOpenWarningDlg(e.getMessage(), AppLocal.getIntString("message.retryorconfig"), true, true);
+                JOpenWarningDlg wDlg = new JOpenWarningDlg(e.getMessage(), AppLocal.getIntString("message.retryorconfig"), true, !AppConfig.getInstance().getBoolean("machine.disableconfigonDBerror"));
                 wDlg.setModal(true);
                 wDlg.setVisible(true);
                 rc = JOpenWarningDlg.CHOICE;
