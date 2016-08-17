@@ -19,6 +19,7 @@
 
 package uk.chromis.pos.admin;
 
+import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Component;
 import java.util.UUID;
@@ -31,6 +32,8 @@ import uk.chromis.data.user.EditorRecord;
 import uk.chromis.format.Formats;
 import uk.chromis.pos.forms.AppLocal;
 import uk.chromis.pos.util.Base64Encoder;
+import org.fife.ui.rsyntaxtextarea.*;
+import org.fife.ui.rtextarea.*;
 
 /**
  *
@@ -40,12 +43,21 @@ public final class ResourcesView extends JPanel implements EditorRecord {
     
     private Object m_oId;
     private ComboBoxValModel m_ResourceModel;
+    private RSyntaxTextArea m_textArea;
+    private RTextScrollPane sp;
             
     /** Creates new form ResourcesEditor
      * @param dirty */
     public ResourcesView(DirtyManager dirty) {
         initComponents();
         
+        JPanel cp = new JPanel(new BorderLayout());
+        m_textArea = new RSyntaxTextArea(20, 60);
+        m_textArea.setCodeFoldingEnabled(true);
+        sp = new RTextScrollPane(m_textArea); 
+        cp.add(sp);
+        m_jContainer.add(cp, "text");
+       
         m_ResourceModel = new ComboBoxValModel();
         m_ResourceModel.add(ResourceType.TEXT);
         m_ResourceModel.add(ResourceType.IMAGE);
@@ -54,7 +66,7 @@ public final class ResourcesView extends JPanel implements EditorRecord {
         
         m_jName.getDocument().addDocumentListener(dirty);
         m_jType.addActionListener(dirty);
-        m_jText.getDocument().addDocumentListener(dirty);
+        m_textArea.getDocument().addDocumentListener(dirty);
         m_jImage.addPropertyChangeListener("image", dirty);
         
         writeValueEOF();        
@@ -68,11 +80,11 @@ public final class ResourcesView extends JPanel implements EditorRecord {
         m_oId = null;
         m_jName.setText(null);
         m_ResourceModel.setSelectedItem(null);
-        m_jText.setText(null);
+        m_textArea.setText(null);
         m_jImage.setImage(null);     
         m_jName.setEnabled(false);
         m_jType.setEnabled(false);
-        m_jText.setEnabled(false);
+        m_textArea.setEnabled(false);
         m_jImage.setEnabled(false);
     }
 
@@ -84,11 +96,11 @@ public final class ResourcesView extends JPanel implements EditorRecord {
         m_oId = null;
         m_jName.setText(null);
         m_ResourceModel.setSelectedItem(ResourceType.TEXT);
-        m_jText.setText(null);
+        m_textArea.setText(null);
         m_jImage.setImage(null);     
         m_jName.setEnabled(true);
         m_jType.setEnabled(true);
-        m_jText.setEnabled(true);
+        m_textArea.setEnabled(true);
         m_jImage.setEnabled(true);
     }
     
@@ -105,25 +117,26 @@ public final class ResourcesView extends JPanel implements EditorRecord {
         
         ResourceType restype = (ResourceType) m_ResourceModel.getSelectedItem();
         if (restype == ResourceType.TEXT) {
-            m_jText.setText(Formats.BYTEA.formatValue(resource[3]));
-            m_jText.setCaretPosition(0);
+            m_textArea.setText(Formats.BYTEA.formatValue(resource[3]));
+            m_textArea.setSyntaxEditingStyle(this.getResourceSyntaxStyle(m_textArea.getText()));
+            m_textArea.setCaretPosition(0);
             m_jImage.setImage(null);
         } else if (restype == ResourceType.IMAGE) {
-            m_jText.setText(null);
+            m_textArea.setText(null);
             m_jImage.setImage(ImageUtils.readImage((byte[]) resource[3]));
         } else if (restype == ResourceType.BINARY) {
-            m_jText.setText(resource[3] == null
+            m_textArea.setText(resource[3] == null
                     ? null
                     : Base64Encoder.encodeChunked((byte[]) resource[3]));
-            m_jText.setCaretPosition(0);
+            m_textArea.setCaretPosition(0);
             m_jImage.setImage(null);
         } else {
-            m_jText.setText(null);
+            m_textArea.setText(null);
             m_jImage.setImage(null);
         }
         m_jName.setEnabled(false);
         m_jType.setEnabled(false);
-        m_jText.setEnabled(false);
+        m_textArea.setEnabled(false);
         m_jImage.setEnabled(false);       
     }
 
@@ -140,25 +153,26 @@ public final class ResourcesView extends JPanel implements EditorRecord {
         
         ResourceType restype = (ResourceType) m_ResourceModel.getSelectedItem();
         if (restype == ResourceType.TEXT) {
-            m_jText.setText(Formats.BYTEA.formatValue(resource[3]));
-            m_jText.setCaretPosition(0);
+            m_textArea.setText(Formats.BYTEA.formatValue(resource[3]));
+            m_textArea.setSyntaxEditingStyle(this.getResourceSyntaxStyle(m_textArea.getText()));
+            m_textArea.setCaretPosition(0);
             m_jImage.setImage(null);
         } else if (restype == ResourceType.IMAGE) {
-            m_jText.setText(null);
+            m_textArea.setText(null);
             m_jImage.setImage(ImageUtils.readImage((byte[]) resource[3]));
         } else if (restype == ResourceType.BINARY) {
-            m_jText.setText(resource[2] == null
+            m_textArea.setText(resource[2] == null
                     ? null
                     : Base64Encoder.encodeChunked((byte[]) resource[3]));
-            m_jText.setCaretPosition(0);
+            m_textArea.setCaretPosition(0);
             m_jImage.setImage(null);
         } else {
-            m_jText.setText(null);
+            m_textArea.setText(null);
             m_jImage.setImage(null);
         }
         m_jName.setEnabled(true);
         m_jType.setEnabled(true);
-        m_jText.setEnabled(true);
+        m_textArea.setEnabled(true);
         m_jImage.setEnabled(true);
     }
     
@@ -177,11 +191,11 @@ public final class ResourcesView extends JPanel implements EditorRecord {
         ResourceType restype = (ResourceType) m_ResourceModel.getSelectedItem();
         resource[2] = restype.getKey();
         if (restype == ResourceType.TEXT) {
-            resource[3] = Formats.BYTEA.parseValue(m_jText.getText());
+            resource[3] = Formats.BYTEA.parseValue(m_textArea.getText());
         } else if (restype == ResourceType.IMAGE) {
             resource[3] = ImageUtils.writeImage(m_jImage.getImage());
         } else if (restype == ResourceType.BINARY) {
-            resource[3] = Base64Encoder.decode(m_jText.getText());
+            resource[3] = Base64Encoder.decode(m_textArea.getText());
         } else {
             resource[3] = null;
         }
@@ -210,6 +224,18 @@ public final class ResourcesView extends JPanel implements EditorRecord {
         cl.show(m_jContainer, view);  
     }
     
+    private String getResourceSyntaxStyle(String resource) {
+        
+        if(resource.indexOf("<?xml") != -1) {
+            return SyntaxConstants.SYNTAX_STYLE_XML;
+        } else if(resource.indexOf("SELECT") != -1 || resource.indexOf("UPDATE") != -1) {
+            return SyntaxConstants.SYNTAX_STYLE_SQL;
+        } else {
+            return SyntaxConstants.SYNTAX_STYLE_JAVA;
+        }
+        
+    }
+    
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -219,24 +245,23 @@ public final class ResourcesView extends JPanel implements EditorRecord {
     private void initComponents() {
 
         m_jGroupType = new javax.swing.ButtonGroup();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        rSyntaxTextArea1 = new org.fife.ui.rsyntaxtextarea.RSyntaxTextArea();
         jPanel3 = new javax.swing.JPanel();
         m_jContainer = new javax.swing.JPanel();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        m_jText = new javax.swing.JTextArea();
         jPanel1 = new javax.swing.JPanel();
         m_jImage = new uk.chromis.data.gui.JImageEditor();
         jLabel2 = new javax.swing.JLabel();
         m_jName = new javax.swing.JTextField();
         m_jType = new javax.swing.JComboBox();
 
+        rSyntaxTextArea1.setColumns(20);
+        rSyntaxTextArea1.setRows(5);
+        jScrollPane2.setViewportView(rSyntaxTextArea1);
+
         jPanel3.setLayout(new java.awt.BorderLayout());
 
         m_jContainer.setLayout(new java.awt.CardLayout());
-
-        m_jText.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
-        jScrollPane1.setViewportView(m_jText);
-
-        m_jContainer.add(jScrollPane1, "text");
         m_jContainer.add(jPanel1, "null");
         m_jContainer.add(m_jImage, "image");
 
@@ -305,13 +330,13 @@ public final class ResourcesView extends JPanel implements EditorRecord {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel3;
-    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JPanel m_jContainer;
     private javax.swing.ButtonGroup m_jGroupType;
     private uk.chromis.data.gui.JImageEditor m_jImage;
     private javax.swing.JTextField m_jName;
-    private javax.swing.JTextArea m_jText;
     private javax.swing.JComboBox m_jType;
+    private org.fife.ui.rsyntaxtextarea.RSyntaxTextArea rSyntaxTextArea1;
     // End of variables declaration//GEN-END:variables
     
 }
