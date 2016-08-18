@@ -34,6 +34,7 @@ import uk.chromis.pos.printer.escpos.CodesSurePOS;
 import uk.chromis.pos.printer.escpos.CodesTMU220;
 import uk.chromis.pos.printer.escpos.DeviceDisplayESCPOS;
 import uk.chromis.pos.printer.escpos.DeviceDisplaySurePOS;
+import uk.chromis.pos.printer.escpos.DeviceDisplayBA63;
 import uk.chromis.pos.printer.escpos.DevicePrinterESCPOS;
 import uk.chromis.pos.printer.escpos.DevicePrinterPlain;
 import uk.chromis.pos.printer.escpos.PrinterWritter;
@@ -137,6 +138,9 @@ public class DeviceTicket {
                 case "surepos":
                     m_devicedisplay = new DeviceDisplaySurePOS(pws.getPrinterWritter(sDisplayParam1, sDisplayParam2));
                     break;
+                case "ba63":
+                    m_devicedisplay = new DeviceDisplayBA63(pws.getPrinterWritter(sDisplayParam1, sDisplayParam2), new UnicodeTranslatorSurePOS());
+                    break;                    
                 case "ld200":
                     m_devicedisplay = new DeviceDisplayESCPOS(pws.getPrinterWritter(sDisplayParam1, sDisplayParam2), new UnicodeTranslatorEur());
                     break;

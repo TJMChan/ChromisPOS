@@ -240,6 +240,7 @@ public class JPanelConfigPeripheral extends javax.swing.JPanel implements PanelC
         jcboMachineDisplay.addItem("epson");
         jcboMachineDisplay.addItem("ld200");
         jcboMachineDisplay.addItem("surepos");
+        jcboMachineDisplay.addItem("ba63");
 
         jcboConnDisplay.addItem("serial");
         jcboConnDisplay.addItem("file");
@@ -684,6 +685,7 @@ public class JPanelConfigPeripheral extends javax.swing.JPanel implements PanelC
             case "epson":
             case "ld200":
             case "surepos":
+            case "ba63":
                 AppConfig.getInstance().setProperty("machine.display", sMachineDisplay + ":" + comboValue(jcboConnDisplay.getSelectedItem()) + "," + comboValue(jcboSerialDisplay.getSelectedItem()));
                 break;
             case "javapos":
@@ -2002,7 +2004,7 @@ public class JPanelConfigPeripheral extends javax.swing.JPanel implements PanelC
     private void jcboMachineDisplayActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jcboMachineDisplayActionPerformed
         CardLayout cl = (CardLayout) (m_jDisplayParams.getLayout());
 
-        if ("epson".equals(jcboMachineDisplay.getSelectedItem()) || "ld200".equals(jcboMachineDisplay.getSelectedItem()) || "surepos".equals(jcboMachineDisplay.getSelectedItem())) {
+        if ("epson".equals(jcboMachineDisplay.getSelectedItem()) || "ld200".equals(jcboMachineDisplay.getSelectedItem()) || "surepos".equals(jcboMachineDisplay.getSelectedItem()) || "ba63".equals(jcboMachineDisplay.getSelectedItem())) {
             cl.show(m_jDisplayParams, "comm");
         } else if ("javapos".equals(jcboMachineDisplay.getSelectedItem())) {
             cl.show(m_jDisplayParams, "javapos");
