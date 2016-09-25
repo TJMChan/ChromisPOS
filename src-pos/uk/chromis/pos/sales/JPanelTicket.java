@@ -2673,7 +2673,7 @@ public abstract class JPanelTicket extends JPanel implements JPanelView, BeanFac
 
     private void m_jDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_m_jDeleteActionPerformed
         int i = m_ticketlines.getSelectedIndex();
-        if (m_oTicket.getLine(i).getProductID().equals("sc999-001")) {
+        if ("sc999-001".equals(m_oTicket.getLine(i).getProductID())) {
             m_oTicket.setNoSC("1");
         }
 
