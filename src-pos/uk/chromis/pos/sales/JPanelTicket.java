@@ -23,6 +23,7 @@ import bsh.Interpreter;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
@@ -102,6 +103,7 @@ import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.SourceDataLine;
+import uk.chromis.pos.catalog.JCatalog;
 import uk.chromis.pos.ticket.PlayWave;
 
 public abstract class JPanelTicket extends JPanel implements JPanelView, BeanFactoryApp, TicketsEditor {
@@ -161,6 +163,7 @@ public abstract class JPanelTicket extends JPanel implements JPanelView, BeanFac
     private AppConfig m_config;
     private PromotionSupport m_promotionSupport = null;
     private Boolean fromNumberPad = true;
+    private Component southcomponent;
 
     // Public variables
     public static Boolean autoLogoffEnabled;
@@ -282,6 +285,28 @@ public abstract class JPanelTicket extends JPanel implements JPanelView, BeanFac
                 });
             }
 // end of Screen display code
+        }
+
+        if((this instanceof JPanelTicketSales)) {
+            southcomponent = getSouthComponent();
+            catcontainer.add(southcomponent, BorderLayout.CENTER);
+            JCatalog catpanel = (JCatalog) southcomponent;
+            ((JPanel) catpanel.getComponent(0)).setBorder(javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5));
+
+            JPanel fpanel = new JPanel(new BorderLayout());
+            fpanel.add(m_jPanEntries,BorderLayout.WEST);
+            fpanel.add(catpanel.getCatComponent(),BorderLayout.EAST);
+
+            m_jPanEntriesE.add(jPanel5,BorderLayout.WEST);
+            m_jPanEntriesE.add(fpanel,BorderLayout.EAST);
+
+            m_jContEntries.add(m_jPanEntriesE,BorderLayout.NORTH);
+            m_jContEntries.add(catpanel.getProductComponent(),BorderLayout.CENTER);
+
+            catpanel.setControls("south");   
+            catpanel.getCatComponent().setPreferredSize(new Dimension(250,10));
+            catpanel.getProductComponent().setPreferredSize(new Dimension(250,350));
+            southcomponent.setPreferredSize(new Dimension(0,0));
         }
     }
 
@@ -2063,6 +2088,7 @@ public abstract class JPanelTicket extends JPanel implements JPanelView, BeanFac
         m_jTax = new javax.swing.JComboBox();
         m_jaddtax = new javax.swing.JToggleButton();
         m_jKeyFactory = new javax.swing.JTextField();
+        m_jPanEntriesE = new javax.swing.JPanel();
         catcontainer = new javax.swing.JPanel();
 
         setBackground(new java.awt.Color(255, 204, 153));
@@ -2555,6 +2581,9 @@ public abstract class JPanelTicket extends JPanel implements JPanelView, BeanFac
 
         m_jContEntries.add(m_jPanEntries, java.awt.BorderLayout.NORTH);
 
+        m_jPanEntriesE.setLayout(new java.awt.BorderLayout());
+        m_jContEntries.add(m_jPanEntriesE, java.awt.BorderLayout.LINE_END);
+
         m_jPanContainer.add(m_jContEntries, java.awt.BorderLayout.LINE_END);
 
         catcontainer.setBorder(javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5));
@@ -2883,6 +2912,7 @@ public abstract class JPanelTicket extends JPanel implements JPanelView, BeanFac
     private javax.swing.JPanel m_jOptions;
     private javax.swing.JPanel m_jPanContainer;
     private javax.swing.JPanel m_jPanEntries;
+    private javax.swing.JPanel m_jPanEntriesE;
     private javax.swing.JPanel m_jPanTicket;
     private javax.swing.JPanel m_jPanTotals;
     private javax.swing.JPanel m_jPanelBag;

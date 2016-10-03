@@ -19,6 +19,7 @@
 //
 package uk.chromis.pos.catalog;
 
+import java.awt.BorderLayout;
 import uk.chromis.basic.BasicException;
 import uk.chromis.data.gui.JMessageDialog;
 import uk.chromis.data.gui.MessageInf;
@@ -32,6 +33,7 @@ import uk.chromis.pos.util.ThumbNailBuilder;
 import java.awt.CardLayout;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.GridLayout;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -135,7 +137,24 @@ public class JCatalog extends JPanel implements ListSelectionListener, CatalogSe
             showProductPanel(id);
         }
     }
+    public Component getCatComponent() {
+        return m_jCategories;
+    }
 
+    public Component getProductComponent() {
+        return m_jProducts;
+    }
+
+    public boolean setControls(String position) {
+        if(position.equals("south")) {
+            m_jRootCategories.add(jPanel2,BorderLayout.SOUTH);
+            m_jSubCategories.add(jPanel1,BorderLayout.SOUTH);
+            ((GridLayout)jPanel3.getLayout()).setRows(1);
+            ((GridLayout)jPanel5.getLayout()).setRows(1);
+            return true;
+        } 
+        return false;
+    }
     /**
      *
      * @throws BasicException
