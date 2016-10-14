@@ -70,7 +70,6 @@ public class JCatalogTab extends javax.swing.JPanel {
         JButton btn = new JButton();
         btn.applyComponentOrientation(getComponentOrientation());
         btn.setIcon(ico);
-        //btn.setPreferredSize(new Dimension(60, 40));      
         btn.setFocusPainted(false);
         btn.setFocusable(false);
         if (textTip != null){

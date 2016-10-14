@@ -92,8 +92,8 @@ public class PaymentInfoList {
             }
         }
         if (cash) {
-            if (dPaidOther == 0.00) {
-                m_apayment.add(new PaymentInfoCash_original(m_dTotal, dPaidCash));
+            if (dPaidCash < m_dTotal - dPaidOther) {
+                m_apayment.add(new PaymentInfoCash_original(dPaidCash, dPaidCash));
             } else {
                 m_apayment.add(new PaymentInfoCash_original(m_dTotal - dPaidOther, dPaidCash));
             }
