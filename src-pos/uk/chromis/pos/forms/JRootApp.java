@@ -811,12 +811,9 @@ public class JRootApp extends JPanel implements AppView {
     }
 
     private void showLogin() {
-
-        // Show Login
         listPeople();
         showView("login");
 
-        // show welcome message
         printerStart();
 
         // keyboard listener activation

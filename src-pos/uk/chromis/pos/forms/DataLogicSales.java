@@ -1161,7 +1161,9 @@ public class DataLogicSales extends BeanFactoryDataSingle {
                 // }
 
                 final Payments payments = new Payments();
-                SentenceExec paymentinsert = new PreparedSentence(s, "INSERT INTO PAYMENTS (ID, RECEIPT, PAYMENT, TOTAL, TRANSID, RETURNMSG, TENDERED, CARDNAME) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", SerializerWriteParams.INSTANCE);
+                SentenceExec paymentinsert = new PreparedSentence(s, 
+                        "INSERT INTO PAYMENTS (ID, RECEIPT, PAYMENT, TOTAL, TRANSID, RETURNMSG, TENDERED, CARDNAME) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                        SerializerWriteParams.INSTANCE);
 
                 for (final PaymentInfo p : ticket.getPayments()) {
                     payments.addPayment(p.getName(), p.getTotal(), p.getPaid(), ticket.getReturnMessage());
@@ -1189,7 +1191,7 @@ public class DataLogicSales extends BeanFactoryDataSingle {
                             payments.removeFirst(pName);
                         }
                     });
-
+            
                     if ("debt".equals(pName) || "debtpaid".equals(pName)) {
                         // udate customer fields...
                         ticket.getCustomer().updateCurDebt(getTotal, ticket.getDate());
