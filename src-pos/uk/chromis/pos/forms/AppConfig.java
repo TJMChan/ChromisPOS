@@ -180,6 +180,7 @@ public class AppConfig implements AppProperties {
         m_propsconfig.setProperty("machine.display", "Not defined");
         m_propsconfig.setProperty("machine.scale", "Not defined");
         m_propsconfig.setProperty("machine.screenmode", "window"); // fullscreen / window
+        m_propsconfig.setProperty("machine.saleslayout", "Default");
         m_propsconfig.setProperty("machine.ticketsbag", "standard");
         m_propsconfig.setProperty("machine.scanner", "Not defined");
 

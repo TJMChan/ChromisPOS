@@ -63,6 +63,7 @@ public class JPanelConfigSystem extends javax.swing.JPanel implements PanelConfi
         jTableRetain.addChangeListener(dirty);
         jUpdatedbprice.addActionListener(dirty);
         jChangeSalesScreen.addActionListener(dirty);
+        jHideCatalogIcons.addActionListener(dirty);
         jConsolidate.addActionListener(dirty);
         jDisableDefaultProduct.addActionListener(dirty);
         jTaxIncluded.addActionListener(dirty);
@@ -124,6 +125,7 @@ public class JPanelConfigSystem extends javax.swing.JPanel implements PanelConfi
         jCloseCashbtn.setSelected(AppConfig.getInstance().getBoolean("screen.600800"));
         jUpdatedbprice.setSelected(AppConfig.getInstance().getBoolean("db.productupdate"));
         jChangeSalesScreen.setSelected(AppConfig.getInstance().getBoolean("sales.newscreen"));
+        jHideCatalogIcons.setSelected(AppConfig.getInstance().getBoolean("sales.hidecatalogicons"));
         jConsolidate.setSelected(AppConfig.getInstance().getBoolean("display.consolidated"));
         jDisableDefaultProduct.setSelected(AppConfig.getInstance().getBoolean("product.hidedefaultproductedit"));
         jTaxIncluded.setSelected(AppConfig.getInstance().getBoolean("till.taxincluded"));
@@ -188,6 +190,7 @@ public class JPanelConfigSystem extends javax.swing.JPanel implements PanelConfi
         AppConfig.getInstance().setProperty("dbtable.retaindays", jTableRetain.getValue().toString());
         AppConfig.getInstance().setBoolean("db.productupdate", jUpdatedbprice.isSelected());
         AppConfig.getInstance().setBoolean("sales.newscreen", jChangeSalesScreen.isSelected());
+        AppConfig.getInstance().setBoolean("sales.hidecatalogicons", jHideCatalogIcons.isSelected());
         AppConfig.getInstance().setBoolean("display.consolidated", jConsolidate.isSelected());
         AppConfig.getInstance().setBoolean("product.hidedefaultproductedit", jDisableDefaultProduct.isSelected());
         AppConfig.getInstance().setBoolean("till.taxincluded", jTaxIncluded.isSelected());
@@ -233,7 +236,7 @@ public class JPanelConfigSystem extends javax.swing.JPanel implements PanelConfi
         jConsolidate = new eu.hansolo.custom.SteelCheckBox();
         jDisableDefaultProduct = new eu.hansolo.custom.SteelCheckBox();
         jCheckPrice00 = new eu.hansolo.custom.SteelCheckBox();
-        jChangeSalesScreen = new eu.hansolo.custom.SteelCheckBox();
+        jHideCatalogIcons = new eu.hansolo.custom.SteelCheckBox();
         jMoveAMountBoxToTop = new eu.hansolo.custom.SteelCheckBox();
         jCategoiesBynumber = new eu.hansolo.custom.SteelCheckBox();
         JlongNames = new eu.hansolo.custom.SteelCheckBox();
@@ -241,6 +244,7 @@ public class JPanelConfigSystem extends javax.swing.JPanel implements PanelConfi
         jMaxChange = new javax.swing.JTextField();
         jLabelMaxChange = new javax.swing.JLabel();
         JCustomSounds = new eu.hansolo.custom.SteelCheckBox();
+        jChangeSalesScreen = new eu.hansolo.custom.SteelCheckBox();
         jLabelInactiveTime = new javax.swing.JLabel();
 
         setMinimumSize(new java.awt.Dimension(700, 500));
@@ -361,8 +365,8 @@ public class JPanelConfigSystem extends javax.swing.JPanel implements PanelConfi
         jCheckPrice00.setRequestFocusEnabled(false);
         jPanel5.add(jCheckPrice00, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 30, 195, -1));
 
-        jChangeSalesScreen.setText(bundle.getString("Label.ChangesSalesScreen")); // NOI18N
-        jPanel5.add(jChangeSalesScreen, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 60, 160, -1));
+        jHideCatalogIcons.setText((bundle.getString("Label.HideCatalogIcons")==null)?"Hide Catalog Icons":bundle.getString("Label.HideCatalogIcons")); // NOI18N
+        jPanel5.add(jHideCatalogIcons, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 120, 160, -1));
 
         jMoveAMountBoxToTop.setBorder(null);
         jMoveAMountBoxToTop.setText(bundle.getString("label.inputamount")); // NOI18N
@@ -391,6 +395,9 @@ public class JPanelConfigSystem extends javax.swing.JPanel implements PanelConfi
 
         JCustomSounds.setText(bundle.getString("label.customerrorsounds")); // NOI18N
         jPanel5.add(JCustomSounds, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 120, 190, -1));
+
+        jChangeSalesScreen.setText(bundle.getString("Label.ChangesSalesScreen")); // NOI18N
+        jPanel5.add(jChangeSalesScreen, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 60, 160, -1));
 
         jPanel4.add(jPanel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(5, 20, 670, 240));
 
@@ -498,6 +505,7 @@ public class JPanelConfigSystem extends javax.swing.JPanel implements PanelConfi
     private eu.hansolo.custom.SteelCheckBox jConsolidate;
     private eu.hansolo.custom.SteelCheckBox jDisableDefaultProduct;
     private eu.hansolo.custom.SteelCheckBox jEnableAutoLogoff;
+    private eu.hansolo.custom.SteelCheckBox jHideCatalogIcons;
     private eu.hansolo.custom.SteelCheckBox jInactivityTimer;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabelInactiveTime;

@@ -396,19 +396,21 @@ public class JRootApp extends JPanel implements AppView {
                 dbReportsSource = new File(currentPath + "/reports/uk/chromis/postgresql");
                 break;
         }
+        if(!getDbVersion().equals(AppConfig.getInstance().getProperty("machine.reportdbver"))) {
+            AppConfig.getInstance().setProperty("machine.reportdbver", getDbVersion());
+            File reportsDestination = new File(currentPath + "/reports/uk/chromis/reports");
 
-        File reportsDestination = new File(currentPath + "/reports/uk/chromis/reports");
-
-        try {
-            File reportsSource = new File(currentPath + "/reports/uk/chromis/default");
-            FileUtils.copyDirectory(reportsSource, new File(currentPath + "/reports/uk/chromis/reports"));
-            if ((dbReportsSource) != null) {
-                FileUtils.copyDirectory(dbReportsSource, new File(currentPath + "/reports/uk/chromis/reports"));
+            try {
+                AppConfig.getInstance().save();
+                File reportsSource = new File(currentPath + "/reports/uk/chromis/default");
+                FileUtils.copyDirectory(reportsSource, new File(currentPath + "/reports/uk/chromis/reports"));
+                if ((dbReportsSource) != null) {
+                    FileUtils.copyDirectory(dbReportsSource, new File(currentPath + "/reports/uk/chromis/reports"));
+                }
+            } catch (IOException ex) {
+                Logger.getLogger(JRootApp.class.getName()).log(Level.SEVERE, null, ex);
             }
-        } catch (IOException ex) {
-            Logger.getLogger(JRootApp.class.getName()).log(Level.SEVERE, null, ex);
         }
-
         showLogin();
 
         return true;

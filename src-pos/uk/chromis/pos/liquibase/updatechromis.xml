@@ -727,7 +727,7 @@
         </sql>
     </changeSet>                                                                                                                                                                                                                                                                                                                                                                                                                                          
   
-    <changeSet author="Chromis POS" id="Create recipes table" >
+    <changeSet author="Chromis POS" id="Create recipes table - mp (NV)" dbms="mysql, postgresql, hypersql, hsqldb, oracle" >
         <preConditions onFail="MARK_RAN">
             <not>
                 <tableExists tableName="PRODUCTS_KIT"/>
@@ -749,6 +749,18 @@
             </column>            
         </createTable>                        
                           
+        <modifySql dbms="mysql">
+            <append value=" ENGINE = InnoDB DEFAULT CHARSET=utf8  "/>
+        </modifySql>                                               
+    </changeSet>       
+
+    <changeSet author="Chromis POS" id="Create recipes table FKs - mp (NV)" dbms="mysql, postgresql, hypersql, hsqldb, oracle" >
+        <preConditions onFail="MARK_RAN">    
+            <not>        
+                <foreignKeyConstraintExists foreignKeyTableName="PRODUCTS_KIT" foreignKeyName="PRODUCTS_KIT_FK_1"/>  
+            </not>          
+        </preConditions>
+        
         <addForeignKeyConstraint baseColumnNames="PRODUCT"
                                  constraintName ="PRODUCTS_KIT_FK_1"
                                  referencedColumnNames = "ID"
@@ -767,7 +779,8 @@
             <column name="PRODUCT" type="varchar(255)"/>
             <column name="PRODUCT_KIT" type="varchar(255)"/>
         </createIndex>                                               
-    </changeSet>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
+    </changeSet>   
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
     <!-- End of new tables sections -->
     <!-- ***************************************************************************************** -->
     <!-- ***************************************************************************************** -->

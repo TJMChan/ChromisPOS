@@ -1,4 +1,4 @@
-//    Chromis POS  - The New Face of Open Source POS
+    //    Chromis POS  - The New Face of Open Source POS
 //    Copyright (c) 2015 
 //    http://www.chromis.co.uk
 //

@@ -636,7 +636,7 @@
                     <Container class="javax.swing.JPanel" name="m_jPanTotals">
                       <Properties>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                          <Dimension value="[375, 60]"/>
+                          <Dimension value="[380, 60]"/>
                         </Property>
                       </Properties>
                       <Constraints>

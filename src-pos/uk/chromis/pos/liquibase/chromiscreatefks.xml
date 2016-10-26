@@ -358,14 +358,23 @@
         </preConditions>  
         <sql>ALTER TABLE RESERVATION_CUSTOMERS ADD CONSTRAINT RES_CUST_FK_2 FOREIGN KEY (CUSTOMER) REFERENCES CUSTOMERS(ID)</sql>
     </changeSet>
-
+    
+    <changeSet author="Chromis POS" id="Fix lEAVES_PPLID mistake (NV)">
+        <preConditions onFail="MARK_RAN">
+            <foreignKeyConstraintExists foreignKeyTableName="LEAVES" foreignKeyName="lEAVES_PPLID"/>            
+        </preConditions>  
+        <sql>ALTER TABLE LEAVES DROP FOREIGN KEY lEAVES_PPLID</sql>
+        <sql>ALTER TABLE LEAVES DROP INDEX lEAVES_PPLID</sql>        
+        <sql>CREATE INDEX LEAVES_PPLID ON LEAVES (PPLID)</sql> 
+    </changeSet>
+    
     <changeSet author="Chromis POS" id="Add LEAVES_PPLID">
         <preConditions onFail="MARK_RAN">
             <not>  
                 <foreignKeyConstraintExists foreignKeyTableName="LEAVES" foreignKeyName="LEAVES_PPLID"/>            
             </not>  
         </preConditions>  
-        <sql>ALTER TABLE LEAVES ADD CONSTRAINT lEAVES_PPLID FOREIGN KEY (PPLID) REFERENCES PEOPLE(ID)</sql>
+        <sql>ALTER TABLE LEAVES ADD CONSTRAINT LEAVES_PPLID FOREIGN KEY (PPLID) REFERENCES PEOPLE(ID)</sql>
     </changeSet>
 
     <changeSet author="Chromis POS" id="Add SHIFT_BREAKS_BREAKID">

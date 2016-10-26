@@ -105,7 +105,7 @@ public class JCatalog extends JPanel implements ListSelectionListener, CatalogSe
         m_jListCategories.addListSelectionListener(this);
 //        m_jListCategories.getPreferredScrollableViewportSize().setSize(400, height); 
 
-        m_jscrollcat.getVerticalScrollBar().setPreferredSize(new Dimension(48, 48));
+        m_jscrollcat.getVerticalScrollBar().setPreferredSize(new Dimension(38, 38));
 
         tnbcat = new ThumbNailBuilder(48, 48, "uk/chromis/images/category.png");
         tnbsubcat = new ThumbNailBuilder(width, height, "uk/chromis/images/subcategory.png");
@@ -494,7 +494,8 @@ public class JCatalog extends JPanel implements ListSelectionListener, CatalogSe
             super.getListCellRendererComponent(list, null, index, isSelected, cellHasFocus);
             CategoryInfo cat = (CategoryInfo) value;
             setText(cat.getName());
-            setIcon(new ImageIcon(tnbcat.getThumbNail(cat.getImage())));
+            if(!AppConfig.getInstance().getBoolean("sales.hidecatalogicons"))
+                setIcon(new ImageIcon(tnbcat.getThumbNail(cat.getImage())));
             return this;
         }
     }

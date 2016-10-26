@@ -103,8 +103,10 @@ import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.SourceDataLine;
+import javax.swing.BorderFactory;
 import uk.chromis.pos.catalog.JCatalog;
 import uk.chromis.pos.ticket.PlayWave;
+import static java.lang.Integer.parseInt;
 
 public abstract class JPanelTicket extends JPanel implements JPanelView, BeanFactoryApp, TicketsEditor {
 
@@ -287,26 +289,89 @@ public abstract class JPanelTicket extends JPanel implements JPanelView, BeanFac
 // end of Screen display code
         }
 
-        if((this instanceof JPanelTicketSales)) {
-            southcomponent = getSouthComponent();
-            catcontainer.add(southcomponent, BorderLayout.CENTER);
-            JCatalog catpanel = (JCatalog) southcomponent;
-            ((JPanel) catpanel.getComponent(0)).setBorder(javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        if(this instanceof JPanelTicketSales) {
+            // 2016-10-14 TJMChan - Sales screen Layout code starts here.
+            if(AppConfig.getInstance().getProperty("machine.saleslayout").equals("Layout 1")) {
+                southcomponent = getSouthComponent();
+                catcontainer.add(southcomponent, BorderLayout.CENTER);
+                JPanel southpanel = (JPanel)southcomponent;
+                ((JPanel) southpanel.getComponent(0)).setBorder(javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
-            JPanel fpanel = new JPanel(new BorderLayout());
-            fpanel.add(m_jPanEntries,BorderLayout.WEST);
-            fpanel.add(catpanel.getCatComponent(),BorderLayout.EAST);
+                JPanel fpanel = new JPanel(new BorderLayout());
+                fpanel.add(m_jPanEntries,BorderLayout.WEST);
+                if(southcomponent instanceof JCatalog) {
+                    fpanel.add(((JCatalog)southpanel).getCatComponent(),BorderLayout.EAST);
+                }
 
-            m_jPanEntriesE.add(jPanel5,BorderLayout.WEST);
-            m_jPanEntriesE.add(fpanel,BorderLayout.EAST);
+                m_jPanEntriesE.add(jPanel5,BorderLayout.WEST);
+                m_jPanEntriesE.add(fpanel,BorderLayout.EAST);
 
-            m_jContEntries.add(m_jPanEntriesE,BorderLayout.NORTH);
-            m_jContEntries.add(catpanel.getProductComponent(),BorderLayout.CENTER);
-
-            catpanel.setControls("south");   
-            catpanel.getCatComponent().setPreferredSize(new Dimension(250,10));
-            catpanel.getProductComponent().setPreferredSize(new Dimension(250,350));
-            southcomponent.setPreferredSize(new Dimension(0,0));
+                m_jTicketId.setPreferredSize(new Dimension(300,16));
+                m_jPanTicket.add(m_jTicketId,BorderLayout.BEFORE_FIRST_LINE);
+                jPanel2.setPreferredSize(new Dimension(90,305));
+                jPanel5.setBorder(BorderFactory.createEmptyBorder(5, 0, 0, 0));
+                jPanel4.add(m_jPanTotals,BorderLayout.CENTER);
+                m_jContEntries.add(m_jPanEntriesE,BorderLayout.NORTH);
+                if(southcomponent instanceof JCatalog) {
+                    JCatalog catpanel = (JCatalog)southpanel;
+                    m_jContEntries.add(catpanel.getProductComponent(),BorderLayout.CENTER);
+                    catpanel.setControls("south");   
+                    catpanel.getCatComponent().setPreferredSize(new Dimension(230,10));
+                    catpanel.getProductComponent().setPreferredSize(new Dimension(230,350));
+                } else
+                    m_jContEntries.add(southpanel,BorderLayout.CENTER);
+                southcomponent.setPreferredSize(new Dimension(0,0));
+            } else if(AppConfig.getInstance().getProperty("machine.saleslayout").equals("Layout 2")) {
+                if(catcontainer.getComponent(0) instanceof JCatalog) {
+                    JCatalog catpanel = (JCatalog)catcontainer.getComponent(0);
+                    catpanel.setControls("south");   
+                    catpanel.getCatComponent().setPreferredSize(new Dimension(230,10));
+                }
+                jPanel4.add(m_jPanTotals,BorderLayout.CENTER);
+                m_jPanContainer.add(m_jPanTicket,BorderLayout.EAST);
+                m_jPanContainer.add(catcontainer,BorderLayout.CENTER);
+                jPanel5.setPreferredSize(new Dimension(80,0));
+                jPanel2.setPreferredSize(new Dimension(90,310));
+                m_jPanEntriesE.add(jPanel5,BorderLayout.CENTER);
+                m_jPanEntriesE.setBorder(BorderFactory.createEmptyBorder(3, 0, 0, 0));
+                m_jContEntries.add(m_jPanEntries,BorderLayout.CENTER);
+                m_jPanEntries.setPreferredSize(new Dimension(250,316));
+                m_jTicketId.setPreferredSize(new Dimension(300,16));
+                m_jPanTicket.add(m_jTicketId,BorderLayout.BEFORE_FIRST_LINE);
+                m_jPanTicket.setPreferredSize(new Dimension(390,316));
+                m_jPanTicket.add(m_jContEntries,BorderLayout.SOUTH);
+            } else if(AppConfig.getInstance().getProperty("machine.saleslayout").equals("Layout 3")) {
+                JPanel catPanel=null;
+                JPanel jpanelA = new JPanel(new BorderLayout());
+                if(catcontainer.getComponent(0) instanceof JCatalog) {
+                    JCatalog myCatpanel = (JCatalog)catcontainer.getComponent(0);
+                    myCatpanel.setControls("south");   
+                    myCatpanel.getCatComponent().setPreferredSize(new Dimension(230,10));
+                    catPanel = (JPanel)myCatpanel.getCatComponent();
+                    catPanel.setBorder(BorderFactory.createEmptyBorder(5,0,0,0));
+                    m_jPanContainer.add(jpanelA,BorderLayout.EAST);
+                    jpanelA.add(catPanel,BorderLayout.CENTER);
+                }
+                jPanel4.add(m_jPanTotals,BorderLayout.CENTER);
+                m_jPanContainer.add(m_jPanTicket,BorderLayout.EAST);
+                m_jPanContainer.add(catcontainer,BorderLayout.CENTER);
+                jPanel5.setPreferredSize(new Dimension(80,0));
+                jPanel2.setPreferredSize(new Dimension(90,310));
+                m_jPanEntriesE.add(jPanel5,BorderLayout.CENTER);
+                m_jPanEntriesE.setBorder(BorderFactory.createEmptyBorder(3, 0, 0, 0));
+                m_jContEntries.add(m_jPanEntries,BorderLayout.CENTER);
+                m_jPanEntries.setPreferredSize(new Dimension(250,316));
+                m_jTicketId.setPreferredSize(new Dimension(300,16));
+                m_jPanTicket.add(m_jTicketId,BorderLayout.BEFORE_FIRST_LINE);
+                if(catPanel!=null) {
+                    m_jPanTicket.setPreferredSize(new Dimension(500,316));
+                    jpanelA.add(m_jContEntries,BorderLayout.EAST);
+                    m_jPanTicket.add(jpanelA,BorderLayout.SOUTH);            
+                } else {
+                    m_jPanTicket.setPreferredSize(new Dimension(390,316));
+                    m_jPanTicket.add(m_jContEntries,BorderLayout.SOUTH);
+                }                
+            }
         }
     }
 
@@ -1868,6 +1933,8 @@ public abstract class JPanelTicket extends JPanel implements JPanelView, BeanFac
     private void updatePromotions(String eventkey, int effectedIndex, String productID) {
         try {
             int selectedIndex = m_ticketlines.getSelectedIndex();
+            if ((selectedIndex < 0) && (productID==null))
+                return; // empty list && no product specified
             if (selectedIndex >= m_oTicket.getLinesCount()) {
                 // Selection is at the end of the list so we restore it to there afterwards
                 selectedIndex = 9999;
@@ -2396,7 +2463,7 @@ public abstract class JPanelTicket extends JPanel implements JPanelView, BeanFac
         m_jTicketId.setVerticalTextPosition(javax.swing.SwingConstants.TOP);
         jPanel4.add(m_jTicketId, java.awt.BorderLayout.CENTER);
 
-        m_jPanTotals.setPreferredSize(new java.awt.Dimension(375, 60));
+        m_jPanTotals.setPreferredSize(new java.awt.Dimension(380, 60));
         m_jPanTotals.setLayout(new java.awt.GridLayout(2, 3, 4, 0));
 
         m_jLblTotalEuros3.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N

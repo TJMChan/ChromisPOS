@@ -633,7 +633,7 @@ public final class StockDiaryEditor extends javax.swing.JPanel
         jPanel1.add(m_jreason, new org.netbeans.lib.awtextra.AbsoluteConstraints(440, 10, 200, 25));
 
         jLabel8.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
-        jLabel8.setText(AppLocal.getIntString("label.warehouse")); // NOI18N
+        jLabel8.setText(AppLocal.getIntString("label.prodname")); // NOI18N
         jLabel8.setMaximumSize(new java.awt.Dimension(40, 20));
         jLabel8.setMinimumSize(new java.awt.Dimension(40, 20));
         jLabel8.setPreferredSize(new java.awt.Dimension(40, 20));
@@ -762,7 +762,7 @@ public final class StockDiaryEditor extends javax.swing.JPanel
         jPanel1.add(m_jprice, new org.netbeans.lib.awtextra.AbsoluteConstraints(230, 150, 70, 25));
 
         jLabel10.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
-        jLabel10.setText(AppLocal.getIntString("label.stockproduct")); // NOI18N
+        jLabel10.setText(AppLocal.getIntString("label.prodref")); // NOI18N
         jLabel10.setMaximumSize(new java.awt.Dimension(40, 20));
         jLabel10.setMinimumSize(new java.awt.Dimension(40, 20));
         jLabel10.setPreferredSize(new java.awt.Dimension(40, 20));

@@ -55,6 +55,7 @@ public class JPanelConfigGeneral extends javax.swing.JPanel implements PanelConf
         jtxtMachineHostname.getDocument().addDocumentListener(dirty);
         jcboLAF.addActionListener(dirty);
         jcboMachineScreenmode.addActionListener(dirty);
+        jcboSalesLayout.addActionListener(dirty);
         jcboTicketsBag.addActionListener(dirty);
         jchkHideInfo.addActionListener(dirty);
         jtxtStartupText.getDocument().addDocumentListener(dirty);
@@ -89,7 +90,12 @@ public class JPanelConfigGeneral extends javax.swing.JPanel implements PanelConf
 
         jcboMachineScreenmode.addItem("window");
         jcboMachineScreenmode.addItem("fullscreen");
-
+        
+        jcboSalesLayout.addItem("Default");
+        jcboSalesLayout.addItem("Layout 1");
+        jcboSalesLayout.addItem("Layout 2");
+        jcboSalesLayout.addItem("Layout 3");
+        
         jcboTicketsBag.addItem("simple");
         jcboTicketsBag.addItem("standard");
         jcboTicketsBag.addItem("restaurant");
@@ -135,6 +141,7 @@ public class JPanelConfigGeneral extends javax.swing.JPanel implements PanelConf
         // jcboLAF.setSelectedItem(new LookAndFeelInfo());
 
         jcboMachineScreenmode.setSelectedItem(AppConfig.getInstance().getProperty("machine.screenmode"));
+        jcboSalesLayout.setSelectedItem(AppConfig.getInstance().getProperty("machine.saleslayout")!=null?AppConfig.getInstance().getProperty("machine.saleslayout"):"Default");
         jcboTicketsBag.setSelectedItem(AppConfig.getInstance().getProperty("machine.ticketsbag"));
         jchkHideInfo.setSelected(AppConfig.getInstance().getBoolean("till.hideinfo"));
         jtxtStartupLogo.setText(AppConfig.getInstance().getProperty("start.logo"));
@@ -159,6 +166,7 @@ public class JPanelConfigGeneral extends javax.swing.JPanel implements PanelConf
                 : laf.getClassName());
 
         AppConfig.getInstance().setProperty("machine.screenmode", comboValue(jcboMachineScreenmode.getSelectedItem()));
+        AppConfig.getInstance().setProperty("machine.saleslayout", comboValue(jcboSalesLayout.getSelectedItem()));
         AppConfig.getInstance().setProperty("machine.ticketsbag", comboValue(jcboTicketsBag.getSelectedItem()));
         AppConfig.getInstance().setBoolean("till.hideinfo", jchkHideInfo.isSelected());
         AppConfig.getInstance().setProperty("start.logo", jtxtStartupLogo.getText());
@@ -288,6 +296,7 @@ public class JPanelConfigGeneral extends javax.swing.JPanel implements PanelConf
         jOrange = new javax.swing.JRadioButton();
         jRoyalBlue = new javax.swing.JRadioButton();
         jIconColour = new javax.swing.JLabel();
+        jcboSalesLayout = new javax.swing.JComboBox<>();
 
         setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         setPreferredSize(new java.awt.Dimension(650, 450));
@@ -384,7 +393,7 @@ public class JPanelConfigGeneral extends javax.swing.JPanel implements PanelConf
             }
         });
         jPanel1.add(jButton1);
-        jButton1.setBounds(60, 63, 40, 23);
+        jButton1.setBounds(60, 63, 40, 24);
 
         jchkHideInfo.setText(bundle.getString("label.Infopanel")); // NOI18N
 
@@ -452,6 +461,8 @@ public class JPanelConfigGeneral extends javax.swing.JPanel implements PanelConf
         jPanel2.add(jRoyalBlue, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 60, -1, -1));
         jPanel2.add(jIconColour, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 20, 70, 60));
 
+        jcboSalesLayout.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+
         javax.swing.GroupLayout jPanel11Layout = new javax.swing.GroupLayout(jPanel11);
         jPanel11.setLayout(jPanel11Layout);
         jPanel11Layout.setHorizontalGroup(
@@ -462,23 +473,28 @@ public class JPanelConfigGeneral extends javax.swing.JPanel implements PanelConf
                         .addContainerGap()
                         .addGroup(jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanel11Layout.createSequentialGroup()
+                                .addGroup(jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(jPanel11Layout.createSequentialGroup()
+                                        .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(jcboLAF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addGroup(jPanel11Layout.createSequentialGroup()
+                                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(jtxtMachineHostname, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addGroup(jPanel11Layout.createSequentialGroup()
+                                        .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addGroup(jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                            .addComponent(jchkHideInfo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                            .addComponent(jcboTicketsBag, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                                .addGap(79, 79, 79))
+                            .addGroup(jPanel11Layout.createSequentialGroup()
                                 .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jcboMachineScreenmode, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(jPanel11Layout.createSequentialGroup()
-                                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jcboLAF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(jPanel11Layout.createSequentialGroup()
-                                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jtxtMachineHostname, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(jPanel11Layout.createSequentialGroup()
-                                .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(jchkHideInfo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(jcboTicketsBag, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))))
+                                .addComponent(jcboMachineScreenmode, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addComponent(jcboSalesLayout, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                     .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 563, Short.MAX_VALUE)
                     .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGap(84, 128, Short.MAX_VALUE))
@@ -497,7 +513,8 @@ public class JPanelConfigGeneral extends javax.swing.JPanel implements PanelConf
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jcboMachineScreenmode, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jcboMachineScreenmode, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jcboSalesLayout, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -508,7 +525,7 @@ public class JPanelConfigGeneral extends javax.swing.JPanel implements PanelConf
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 101, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, 91, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(130, Short.MAX_VALUE))
+                .addContainerGap(127, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -585,6 +602,7 @@ public class JPanelConfigGeneral extends javax.swing.JPanel implements PanelConf
     private javax.swing.JButton jbtnLogoText;
     private javax.swing.JComboBox jcboLAF;
     private javax.swing.JComboBox jcboMachineScreenmode;
+    private javax.swing.JComboBox<String> jcboSalesLayout;
     private javax.swing.JComboBox jcboTicketsBag;
     private eu.hansolo.custom.SteelCheckBox jchkHideInfo;
     private javax.swing.JTextField jtxtMachineHostname;
