@@ -780,7 +780,8 @@ public class JRootApp extends JPanel implements AppView {
     private void showLogin() {
 
         // Show Login
-        listPeople();
+        if(!"true".equals(AppConfig.getInstance().getProperty("machine.hideloginuserslist")))
+            listPeople();
         showView("login");
 
         // show welcome message
