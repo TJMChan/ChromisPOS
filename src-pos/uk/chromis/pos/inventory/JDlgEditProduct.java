@@ -19,13 +19,10 @@
 
 package uk.chromis.pos.inventory;
 
-import java.awt.Component;
-import java.awt.Dialog;
-import java.awt.Frame;
-import java.awt.Window;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import uk.chromis.basic.BasicException;
 import uk.chromis.data.loader.LocalRes;
 import uk.chromis.data.user.DirtyManager;
@@ -38,34 +35,29 @@ import uk.chromis.pos.forms.DataLogicSales;
  * @author adrianromero
  */
 public class JDlgEditProduct extends javax.swing.JDialog {
-    
+
+    public static enum STATUS {
+        WAITING, FAILED, INSERTED, UPDATED
+    }
+
+    private static enum STATE {
+        INSERT, UPDATE
+    }
+
     // private AppView m_App;
     private ProductsEditor producteditor;
     private DataLogicSales m_dlSales;
     private DirtyManager m_dirty;
     private SaveProvider m_SaveProvider;
-    private CompletionCallback m_CallBacks;
-    static private int STATE_INSERT = 0;
-    static private int STATE_UPDATE = 1;
+    private STATUS status = STATUS.WAITING;
+    private STATE state;
+    private String m_productID = null;
     
-    private int state = STATE_INSERT;
-    
-    interface CompletionCallback 
-    {
-        void notifyCompletionOk( String reference );
-        void notifyCompletionCancel();
-    }
- 
     /** Creates new form JDlgUploadProducts */
     public JDlgEditProduct(JFrame parent, boolean modal) {
         super(parent, modal);
-        m_CallBacks = null;
     }
 
-    public void setCallbacks( CompletionCallback callBacks ) {
-        m_CallBacks = callBacks;
-    }
-    
     public void init( DataLogicSales dlSales, DirtyManager dirty, String productID, String barcode ) {
         m_dlSales = dlSales;
         m_dirty = dirty;
@@ -84,29 +76,32 @@ public class JDlgEditProduct extends javax.swing.JDialog {
             producteditor.activate();
             
             if( productID == null ) {
-                state = STATE_INSERT;
+                this.setTitle(AppLocal.getIntString("form.insertProduct"));
+                state = STATE.INSERT;
+                producteditor.writeValueInsert();
+                producteditor.setProduct(null, barcode);
             } else {
-                state = STATE_UPDATE;                
+                this.setTitle(AppLocal.getIntString("form.updateProduct"));
+                state = STATE.UPDATE;                
+                producteditor.setProduct(productID, barcode);
+                producteditor.writeValueEdit(producteditor.createValue());
             }
 
-            producteditor.setProduct( productID, barcode );
         } catch (BasicException ex) {
             Logger.getLogger(JDlgEditProduct.class.getName()).log(Level.SEVERE, null, ex);
         }
         jPanelEditor.add( producteditor );
         
     }
-    
-    private static Window getWindow(Component parent) {
-        if (parent == null) {
-            return new JFrame();
-        } else if (parent instanceof Frame || parent instanceof Dialog) {
-            return (Window)parent;
-        } else {
-            return getWindow(parent.getParent());
-        }
-    }
 
+    public STATUS getExecutionStatus() {
+        return status;
+    }
+    
+    public String getProductID() {
+        return m_productID;
+    }
+    
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -160,49 +155,30 @@ public class JDlgEditProduct extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jcmdCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jcmdCancelActionPerformed
-        if( m_CallBacks != null ) {
-            m_CallBacks.notifyCompletionCancel();
-        }
-        dispose();
+        setVisible(false);
     }//GEN-LAST:event_jcmdCancelActionPerformed
 
     private void jcmdOKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jcmdOKActionPerformed
-       boolean bOK = false;
-        String reference = null;
-        
+
         if( producteditor != null ) {
             try {
                 Object values = producteditor.createValue();
-                if( state == STATE_INSERT ) {
-                    if (m_SaveProvider.insertData(values) > 0) {
-                        bOK = true;
-                    } else {
-                        throw new BasicException(LocalRes.getIntString("exception.noupdate"));
-                    }
-                } else {
-                    if (m_SaveProvider.updateData(values) > 0 ) {
-                        bOK = true;
-                    } else {
-                        throw new BasicException(LocalRes.getIntString("exception.noupdate"));
-                    }
-                }
+                status = ((state == STATE.INSERT)?
+                        (m_SaveProvider.insertData(values)>0)?STATUS.INSERTED:STATUS.FAILED
+                        : (m_SaveProvider.updateData(values)>0)?STATUS.UPDATED:STATUS.FAILED);
                 
-                Object [] aValues = (Object [] ) values;
-                reference = (String) aValues[DataLogicSales.INDEX_REFERENCE];
+                m_productID = (String) ((Object [])values)[DataLogicSales.INDEX_REFERENCE];
                 
             } catch (BasicException ex) {
+                JOptionPane.showMessageDialog(this, ex.getMessage(),
+                        ((state==STATE.INSERT)?LocalRes.getIntString("exception.noinsert"):LocalRes.getIntString("exception.noupdate")),
+                        JOptionPane.ERROR_MESSAGE);
                 Logger.getLogger(JDlgEditProduct.class.getName()).log(Level.SEVERE, null, ex);
+                return;
             }
         }
-        
-        if( m_CallBacks != null ) {
-            if( bOK && producteditor != null ) {
-                m_CallBacks.notifyCompletionOk( reference );
-            } else {
-                m_CallBacks.notifyCompletionCancel();                
-            }
-        }
-        dispose();
+
+        setVisible(false);
 
     }//GEN-LAST:event_jcmdOKActionPerformed
 

@@ -54,11 +54,10 @@ import uk.chromis.pos.ticket.PlayWave;
  *
  * @author adrianromero
  */
-public final class StockDiaryEditor extends javax.swing.JPanel
-        implements EditorRecord, JDlgEditProduct.CompletionCallback {
+public final class StockDiaryEditor extends javax.swing.JPanel implements EditorRecord {
 
     private final CatalogSelector m_cat;
-
+    private boolean m_canProductEdit = false;
     private String m_sID;
 
     private String productid;
@@ -94,7 +93,8 @@ public final class StockDiaryEditor extends javax.swing.JPanel
         m_Dirty = dirty;
 
         initComponents();
-
+        
+        m_canProductEdit = app.getAppUserView().getUser().hasPermission("uk.chromis.pos.inventory.ProductsPanel");
         // El modelo de locales
         m_sentlocations = m_dlSales.getLocationsList();
         m_LocationsModel = new ComboBoxValModel();
@@ -188,7 +188,6 @@ public final class StockDiaryEditor extends javax.swing.JPanel
         m_junits.setEnabled(false);
         m_jprice.setEnabled(false);
         m_cat.setComponentEnabled(false);
-        m_EditProduct.setEnabled(false);
     }
 
     /**
@@ -311,7 +310,7 @@ public final class StockDiaryEditor extends javax.swing.JPanel
         m_jbtndate.setEnabled(false);
         m_jreason.setEnabled(false);
         m_jreference.setEnabled(false);
-        m_EditProduct.setEnabled(false);
+        m_EditProduct.setEnabled(m_canProductEdit);
         m_jcodebar.setEnabled(false);
         m_jEnter.setEnabled(false);
         m_jLocation.setEnabled(false);
@@ -323,7 +322,6 @@ public final class StockDiaryEditor extends javax.swing.JPanel
         m_junits.setEnabled(false);
         m_jprice.setEnabled(false);
         m_cat.setComponentEnabled(false);
-        m_EditProduct.setEnabled(true);
     }
 
     /**
@@ -360,13 +358,6 @@ public final class StockDiaryEditor extends javax.swing.JPanel
     public Component getComponent() {
         return this;
     }
-//    private ProductInfoExt getProduct(String id)  {
-//        try {
-//            return m_dlSales.getProductInfo(id);
-//        } catch (BasicException e) {
-//            return null;
-//        }
-//    }
 
     private Double signum(Double d, Integer i) {
         if (d == null || i == null) {
@@ -430,29 +421,13 @@ public final class StockDiaryEditor extends javax.swing.JPanel
                 m_jreference.setText(productref);
                 m_junitsinstock.setText(unitsinstock);
                 jattributes.setText(null);
-                m_EditProduct.setEnabled(true);
+                m_EditProduct.setEnabled(m_canProductEdit);
 
                 // calculo el precio sugerido para la entrada.
                 MovementReason reason = (MovementReason) m_ReasonModel.getSelectedItem();
                 Double dPrice = reason.getPrice(prod.getPriceBuy(), prod.getPriceSell());
                 m_jprice.setText(Formats.CURRENCY.formatValue(dPrice));
             }
-        }
-    }
-
-    private void assignProductById(String Id) {
-        try {
-            ProductInfoExt oProduct = m_dlSales.getProductInfo(Id);
-            if (oProduct == null) {
-                assignProduct(null);
-                new PlayWave("error.wav").start(); // playing WAVE file 
-            } else {
-                assignProduct(oProduct);
-            }
-        } catch (BasicException eData) {
-            assignProduct(null);
-            MessageInf msg = new MessageInf(eData);
-            msg.show(this);
         }
     }
 
@@ -472,10 +447,10 @@ public final class StockDiaryEditor extends javax.swing.JPanel
                 } else {
                     Toolkit.getDefaultToolkit().beep();
                 }
-                if (JOptionPane.showConfirmDialog(this, AppLocal.getIntString("message.createproduct"),
-                        AppLocal.getIntString("message.title"),
-                        JOptionPane.YES_NO_OPTION,
-                        JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
+                if (m_canProductEdit && JOptionPane.showConfirmDialog(this, AppLocal.getIntString("message.createproduct"),
+                            AppLocal.getIntString("message.title"),
+                            JOptionPane.YES_NO_OPTION,
+                            JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
                     newProduct();
                 }
             } else {
@@ -511,38 +486,41 @@ public final class StockDiaryEditor extends javax.swing.JPanel
 
     private void editProduct() {
         JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
-        JDlgEditProduct dlg = new JDlgEditProduct(topFrame, true);
-        dlg.init(m_dlSales, m_Dirty, productid, null);
-        dlg.setCallbacks(this);
-        dlg.setVisible(true);
+        JDlgEditProduct productDialog = new JDlgEditProduct(topFrame, true);
+        productDialog.init(m_dlSales, m_Dirty, productid, null);
+        productDialog.setVisible(true);
+        updatePanelInfo(productDialog);
     }
 
     private void newProduct() {
         JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
-        JDlgEditProduct dlg = new JDlgEditProduct(topFrame, true);
+        JDlgEditProduct productDialog = new JDlgEditProduct(topFrame, true);
         String code = m_jcodebar.getText();
         
-        dlg.init(m_dlSales, m_Dirty, null, code);
-        dlg.setCallbacks(this);
-        dlg.setVisible(true);
+        productDialog.init(m_dlSales, m_Dirty, null, code);
+        productDialog.setVisible(true);
+        updatePanelInfo(productDialog);
     }
 
-    @Override
-    public void notifyCompletionOk(String reference) {
+    public void updatePanelInfo(JDlgEditProduct productDialog) {
         // Try to assign product again
-        if (reference != null) {
+        if (productDialog.getProductID() != null) {
             writeValueInsert();
-            m_jreference.setText(reference);
+            m_jreference.setText(productDialog.getProductID());
 
             jproduct.setEnabled(true);
             m_junitsinstock.setEnabled(true);
 
             assignProductByReference();
+            
+            // reload catalog layout only if a product was inserted
+            if(productDialog.getExecutionStatus()==JDlgEditProduct.STATUS.INSERTED)
+                try {
+                    m_cat.loadCatalog();
+                } catch (BasicException ex) {
+                    Logger.getLogger(StockDiaryEditor.class.getName()).log(Level.SEVERE, null, ex);
+                }
         }
-    }
-
-    @Override
-    public void notifyCompletionCancel() {
     }
 
     private class CatalogListener implements ActionListener {
