@@ -167,7 +167,10 @@
 	<line></line>
 
 #foreach ($taxinfo in $taxes)
-<!--        #set( $taxline = $ticket.getTaxLine($taxinfo)) -->
+    #set( $taxline = $ticket.getTaxLine($taxinfo))
+    #if(!$taxline)
+        #set($taxline = $taxinfo)
+    #end    
         <line>
             <text align ="left" length="18">${taxline.getTaxInfo()}</text>
             <text align ="right" length="12">${taxline.printSubTotal()}</text>
