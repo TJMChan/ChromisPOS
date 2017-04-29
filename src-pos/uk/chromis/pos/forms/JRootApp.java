@@ -1127,6 +1127,7 @@ public class JRootApp extends JPanel implements AppView {
         JTable table = new JTable(model);
         model.addColumn("Details");
         model.addColumn("Value");
+        model.addRow(new Object[]{"Build Version",AppLocal.APP_BUILD});
         model.addRow(new Object[]{"Database Version", readDataBaseVersion()});
         model.addRow(new Object[]{"Java Version", System.getProperty("java.version")});
         model.addRow(new Object[]{"Jar MD5", md5});

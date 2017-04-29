@@ -72,9 +72,9 @@ public class StartPOS {
      */
     public static void main(final String args[]) {
 
-        String sJavaVersion = System.getProperty("java.version");
-        double dJavaVersion = Double.parseDouble(sJavaVersion.substring(0, sJavaVersion.indexOf('.', sJavaVersion.indexOf('.') + 1)));
-
+        String sJavaVersion = System.getProperty("java.vm.specification.version");
+        double dJavaVersion = Double.parseDouble(sJavaVersion);
+        
         if (dJavaVersion < 1.8) {
             StartupDialog dialog = new StartupDialog();
             JFrame frame = new JFrame("");

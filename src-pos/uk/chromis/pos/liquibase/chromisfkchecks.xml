@@ -87,6 +87,8 @@
             <foreignKeyConstraintExists foreignKeyTableName="LEAVES" foreignKeyName="LEAVES_PPLID"/>            
         </preConditions>  
         <dropForeignKeyConstraint baseTableName="LEAVES" constraintName="LEAVES_PPLID"/>
+        <sql>ALTER TABLE LEAVES DROP INDEX lEAVES_PPLID</sql>
+        <sql>CREATE INDEX LEAVES_PPLID ON LEAVES (PPLID)</sql>
     </changeSet>
     
     <changeSet author="Chromis POS" id="Drop PAYMENTS_FK_RECEIPT">

@@ -54,7 +54,7 @@ public class JFrmConfig extends javax.swing.JFrame {
             this.setIconImage(ImageIO.read(JRootFrame.class.getResourceAsStream("/uk/chromis/fixedimages/smllogo.png")));
         } catch (IOException e) {
         }   
-        setTitle(AppLocal.APP_NAME + " - " + AppLocal.APP_VERSION + " - " + AppLocal.getIntString("Menu.Configuration"));        
+        setTitle(AppLocal.APP_NAME + " - " + AppLocal.APP_VERSION + " - " + AppLocal.APP_BUILD + AppLocal.APP_DEMO + " - " + AppLocal.getIntString("Menu.Configuration"));        
         setPreferredSize(new Dimension(900,750));
         addWindowListener(new MyFrameListener()); 
         

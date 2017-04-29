@@ -1,6 +1,27 @@
+
+28th April 2017(TJMChan)
+- Added custom build information
+- Fixed removal of Aux items.
+- Fixed EAN13 & UPC barcode processing
+- Added custom scan code processing script(Beanshell) hook.
+  Notes for custom scan code processing:     
+    - the code will be passed into the script using a String variable called 
+	"sCode" to be process or decoded
+    - Requires an event key call ticket.customecodeprocessor to link it to 
+	code script(same way as ticket.close and other beanshell scripts)
+   	ie. <event key="ticket.customcodeprocessor" code="<resource name>"/>
+    - code script must return a valid TicketLineInfo class for insertion 
+	to ticket on success
+- Added sample custom partial GS1 barcode script Ticket.CustomBarcodeHandler.bsh
+  that can be used in above hook.
+- Fixed valid number check in ticket sales panel
+- modified source to allow Chromis to run on early release of Java 9
+
+***********************************************************************************************************
 17th January 2017(TJMChan)
 Updated README.txt file and small config name fix to ConfigPaymentPanelBluePay20POST.
 
+***********************************************************************************************************
 12th November 2016(Merged items from Jacob Mellin's Fork)
  18th August 2016(Jacob Mellin)
  Wincor Nixdorf BA63 customer display option
@@ -8,10 +29,12 @@ Updated README.txt file and small config name fix to ConfigPaymentPanelBluePay20
  16th August 2016(Jacob Mellin)
  Implement RSyntaxTextArea as resources code viewer  
 
+***********************************************************************************************************
 12th November 2016(TJMChan)
 Printer.Ticket Template Taxes fix
 - fixes taxes printout on the bottom of ticket when printed from edit tickets panel
 
+***********************************************************************************************************
 1st November 2016(TJMChan)
 Completed code for inserting or updating products from Stock Diary Panel
 It took a bit of work but it's done. Notes on using this updated code is
@@ -21,11 +44,13 @@ as follows:
       form.insertProduct=Insert Product 
       form.updateProduct=Update Product
 
+***********************************************************************************************************
 30th October 2016(TJMChan)
 Added ability to hide users list on login screen for card only access.
 - Set the following in chromispos.properties to hide users list
     machine.hideloginuserslist=true
 
+***********************************************************************************************************
 26th October 2016(TJMChan)
 Added NEW 3 POLISHED SALES PANEL LAYOUTS and other fixes
 - Added 3 polished sales panel layouts
@@ -36,17 +61,20 @@ Added NEW 3 POLISHED SALES PANEL LAYOUTS and other fixes
 - Fixed database update issues from 0.54.3 for LEAVES index and key, and create PRODUCTS_KIT table
 - Fixed labels in StockDiaryEditor panel
 
+***********************************************************************************************************
 3rd October 2016(TJMChan)
 Working sample of changing the sales screen layout by making changes to the UI and code.
 This is what is required to change the layout to look like Layout 1.png at
     https://sourceforge.net/p/chromispos/discussion/help/thread/335c08ec/#424a
 
+***********************************************************************************************************
 10th July 2016(TJMChan)
 Chanaged DB query test method & added ability to disable config panel
 - chanaged database query test to execute after 2 minutes of inactivity
 - Added code to allow disabling of Config Panel on startup when a database is not found
   by adding "machine.disableconfigonDBerror=true" to the chromispos.properties file.
 
+***********************************************************************************************************
 22th May 2016(TJMChan)
 Added code to send a test query to database to check if connection has been dropped after it has checked if the connection is closed
 
@@ -68,12 +96,14 @@ if ping time = 100ms then delay time of 1 second is added to the query time.
 if ping time = 500ms then delay time of 5 seconds is added to the query time.
 
 
+***********************************************************************************************************
 10th March 2016(TJMChan)
 Restored discount scripts fix for sending to kitchen
 - allows items to be sent to kitchen after a discount was applied
 (see forum post https://sourceforge.net/p/chromispos/discussion/help/thread/4f65eaf1/#7a65 for details)
 - Fixed Ticket.Close to show welcome message after non-cash transactions
 
+***********************************************************************************************************
 7th March 2016(TJMChan)
 Fixes Product Finder Stock Level retrieval.
  DataLogicSales.java - Temporary fix
@@ -82,21 +112,24 @@ Fixes Product Finder Stock Level retrieval.
 - added logger to display errors to log window when product queries fail
 
 
+***********************************************************************************************************
 4th-6th March 2016(JohnL)
 fixes to convert when user removes default categories and taxes
 fixes to migrate routine
 Moved new report filter builder using miglayout
 
+***********************************************************************************************************
 1st March 2016(TJMChan)
 Stock Current & Diary Update fix for Product Kit(Recipes)
 - fixes update to current stock to only deduct inventory from kit products and not the kit product
 
+***********************************************************************************************************
 1st March 2016(JohnL)
 -fixed report bug caused by customer discount option
 -Added new option to inventory report
 -Fixed a permissions entry issue
 
-
+***********************************************************************************************************
 29th February 2016
 Release:v0.56
 

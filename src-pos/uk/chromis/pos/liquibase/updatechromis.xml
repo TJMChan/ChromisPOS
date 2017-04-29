@@ -1198,6 +1198,19 @@
             <column name="CONTENT" valueBlobResource="/uk/chromis/pos/promotion/scripts/promotion.fixedpricegroup.txt"/>  
         </insert>  
     </changeSet>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
+
+    <changeSet author="Chromis POS" id="Add script.CustomCodeProcessor">  
+        <preConditions onFail="MARK_RAN">  
+            <sqlCheck expectedResult="0">SELECT COUNT(1) FROM RESOURCES WHERE NAME = 'script.CustomBarcodeHandler'</sqlCheck>  
+        </preConditions>   
+  
+        <insert tableName="RESOURCES">  
+            <column name="ID" value="378100-cb1"/>  
+            <column name="NAME" value="script.CustomCodeProcessor"/>  
+            <column name="RESTYPE" valueNumeric="0"/>  
+            <column name="CONTENT" valueBlobResource="/uk/chromis/pos/templates/script.CustomCodeProcessor.bsh"/>  
+        </insert>  
+    </changeSet>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
     <!-- End of resource changeset section   -->
     <!-- ***************************************************************************************** -->
     <!-- ***************************************************************************************** -->

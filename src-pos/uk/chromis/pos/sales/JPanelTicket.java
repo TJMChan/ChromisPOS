@@ -113,6 +113,7 @@ public abstract class JPanelTicket extends JPanel implements JPanelView, BeanFac
     // Variable numerica
     private final static int NUMBERZERO = 0;
     private final static int NUMBERVALID = 1;
+    private final static int NUMBERINVALID = 2;
     private final static int NUMBER_INPUTZERO = 0;
     private final static int NUMBER_INPUTZERODEC = 1;
     private final static int NUMBER_INPUTINT = 2;
@@ -845,8 +846,7 @@ public abstract class JPanelTicket extends JPanel implements JPanelView, BeanFac
                 if (m_oTicket.getLine(i).isProductCom()) {
                     m_oTicket.removeLine(i);
                     m_ticketlines.removeTicketLine(i);
-                }
-                if (m_oTicket.getLine(i).getPromotionId() != null) {
+                } else if (m_oTicket.getLine(i).getPromotionId() != null) {
                     // Check for promotion discounts added to the product
                     m_oTicket.removeLine(i);
                     m_ticketlines.removeTicketLine(i);
@@ -1203,7 +1203,7 @@ public abstract class JPanelTicket extends JPanel implements JPanelView, BeanFac
                     stateToZero();
 // lets look at variable price barcodes thhat conform to GS1 standard
 // For more details see Chromis docs
-                } else if (((sCode.length() == 13) && (sCode.startsWith("2"))) || ((sCode.length() == 12) && (sCode.startsWith("2")))) {
+                } else if ( sCode.startsWith("2") && ( (sCode.length() == 13)|| (sCode.length() == 12)) )   {
 // we now have a variable barcode being passed   
 // get the variable type   
                     ProductInfoExt oProduct = null;
@@ -1216,25 +1216,22 @@ public abstract class JPanelTicket extends JPanel implements JPanelView, BeanFac
                     if (oProduct != null) {
                         incProductByCode(sCode);
                     } else {
-
+                        
                         String sVariableTypePrefix;
                         String prodCode;
                         String sVariableNum;
                         double dPriceSell = 0.0;
                         double weight = 1.0;
+                        int iBarCodeLen = sCode.length();
+                        int iValueIndex;
+                        
+                        sVariableTypePrefix = sCode.substring(0, 2);
+                        iValueIndex = sVariableTypePrefix.equals("28")&&(iBarCodeLen==13)?iBarCodeLen-6:iBarCodeLen-5;
+                        sVariableNum = sCode.substring(iValueIndex, iBarCodeLen-1);
+                        prodCode = sCode.substring(0,iValueIndex).concat("000000");
+                        prodCode = prodCode.substring(0, iBarCodeLen - 1);
 
-                        if (sCode.length() == 13) {
-                            sVariableTypePrefix = sCode.substring(0, 2);
-                            sVariableNum = sCode.substring(8, 12);
-                            prodCode = sCode.replace(sCode.substring(7, sCode.length() - 1), "00000");
-                            prodCode = prodCode.substring(0, sCode.length() - 1);
-                        } else {
-                            sVariableTypePrefix = sCode.substring(0, 2);;
-                            sVariableNum = sCode.substring(7, 11);
-                            prodCode = sCode.replace(sCode.substring(6, sCode.length() - 1), "00000");
-                            prodCode = prodCode.substring(0, sCode.length() - 1);
-                        }
-                        if (sCode.length() == 13) {
+                        if (iBarCodeLen == 13) {
                             switch (sVariableTypePrefix) {
                                 case "20":
                                     dPriceSell = Double.parseDouble(sVariableNum) / 100;
@@ -1255,17 +1252,11 @@ public abstract class JPanelTicket extends JPanel implements JPanelView, BeanFac
                                     weight = Double.parseDouble(sVariableNum) / 10;
                                     break;
                                 case "28":
-                                    sVariableNum = sCode.substring(7, 12);
                                     dPriceSell = Double.parseDouble(sVariableNum) / 100;
                                     break;
                             }
-                        } else if (sCode.length() == 12) {
-                            switch (sCode.substring(0, 1)) {
-                                case "2":
-                                    sVariableNum = sCode.substring(6, 11);
-                                    dPriceSell = Double.parseDouble(sVariableNum) / 100;
-                                    break;
-                            }
+                        } else if ((iBarCodeLen == 12) && sCode.substring(0, 1).equals("2") ) {
+                            dPriceSell = Double.parseDouble(sVariableNum) / 100;
                         }
 // we now know the product code and the price or weight of it.
 // lets check for the product in the database. 
@@ -1281,7 +1272,7 @@ public abstract class JPanelTicket extends JPanel implements JPanelView, BeanFac
                                         prodCode + " - " + AppLocal.getIntString("message.noproduct"),
                                         "Check", JOptionPane.WARNING_MESSAGE);
                                 stateToZero();
-                            } else if (sCode.length() == 13) {
+                            } else if (iBarCodeLen == 13) {
                                 switch (sVariableTypePrefix) {
                                     case "23":
                                     case "24":
@@ -1311,6 +1302,13 @@ public abstract class JPanelTicket extends JPanel implements JPanelView, BeanFac
                             new MessageInf(eData).show(this);
                         }
                     }
+                } else if(m_jbtnconfig.getEvent("script.CustomCodeProcessor")!=null) {
+                    Object oTicketLine = executeEvent(m_oTicket, m_oTicketExt, "script.CustomCodeProcessor",new ScriptArg("sCode",sCode));
+                    if(oTicketLine instanceof TicketLineInfo) {
+                        addTicketLine((TicketLineInfo)oTicketLine);
+                    } else { 
+                        incProductByCode(sCode);
+                    }
                 } else {
                     incProductByCode(sCode);
                 }
@@ -1319,7 +1317,7 @@ public abstract class JPanelTicket extends JPanel implements JPanelView, BeanFac
             } else {
                 Toolkit.getDefaultToolkit().beep();
             }
-
+        
             /**
              * ******************************************************************
              * end of barcode handling routine
@@ -1332,15 +1330,16 @@ public abstract class JPanelTicket extends JPanel implements JPanelView, BeanFac
                 stateToZero();
             } else if ((cTrans == '0') && (m_iNumberStatus == NUMBER_INPUTZERO)) {
                 m_jPrice.setText("0");
-            } else if ((cTrans == '1' || cTrans == '2' || cTrans == '3' || cTrans == '4' || cTrans == '5' || cTrans == '6' || cTrans == '7' || cTrans == '8' || cTrans == '9') && (m_iNumberStatus == NUMBER_INPUTZERO)) {
+            } else if (Character.isDigit(cTrans) && (m_iNumberStatus == NUMBER_INPUTZERO)) {
                 if (!priceWith00) {
                     m_jPrice.setText(Character.toString(cTrans));
                 } else {
                     m_jPrice.setText(setTempjPrice(Character.toString(cTrans)));
                 }
                 m_iNumberStatus = NUMBER_INPUTINT;
-                m_iNumberStatusInput = NUMBERVALID;
-            } else if ((cTrans == '0' || cTrans == '1' || cTrans == '2' || cTrans == '3' || cTrans == '4' || cTrans == '5' || cTrans == '6' || cTrans == '7' || cTrans == '8' || cTrans == '9') && (m_iNumberStatus == NUMBER_INPUTINT)) {
+                if(m_iNumberStatusInput!= NUMBERINVALID)
+                    m_iNumberStatusInput = NUMBERVALID;
+            } else if ( Character.isDigit(cTrans) && (m_iNumberStatus == NUMBER_INPUTINT)) {
                 if (!priceWith00) {
                     m_jPrice.setText(m_jPrice.getText() + cTrans);
                 } else {
@@ -1368,10 +1367,11 @@ public abstract class JPanelTicket extends JPanel implements JPanelView, BeanFac
                 } else {
                     m_jPrice.setText(setTempjPrice(m_jPrice.getText() + cTrans));
                 }
-            } else if ((cTrans == '1' || cTrans == '2' || cTrans == '3' || cTrans == '4' || cTrans == '5' || cTrans == '6' || cTrans == '7' || cTrans == '8' || cTrans == '9') && (m_iNumberStatus == NUMBER_INPUTZERODEC || m_iNumberStatus == NUMBER_INPUTDEC)) {
+            } else if (Character.isDigit(cTrans) && (m_iNumberStatus == NUMBER_INPUTZERODEC || m_iNumberStatus == NUMBER_INPUTDEC)) {
                 m_jPrice.setText(m_jPrice.getText() + cTrans);
                 m_iNumberStatus = NUMBER_INPUTDEC;
-                m_iNumberStatusInput = NUMBERVALID;
+                if(m_iNumberStatusInput!= NUMBERINVALID)
+                    m_iNumberStatusInput = NUMBERVALID;
             } else if (cTrans == '*' && (m_iNumberStatus == NUMBER_INPUTINT || m_iNumberStatus == NUMBER_INPUTDEC)) {
                 m_jPor.setText("x");
                 m_iNumberStatus = NUMBER_PORZERO;
@@ -1381,11 +1381,11 @@ public abstract class JPanelTicket extends JPanel implements JPanelView, BeanFac
                 m_iNumberStatus = NUMBER_PORZERO;
             } else if ((cTrans == '0') && (m_iNumberStatus == NUMBER_PORZERO)) {
                 m_jPor.setText("x0");
-            } else if ((cTrans == '1' || cTrans == '2' || cTrans == '3' || cTrans == '4' || cTrans == '5' || cTrans == '6' || cTrans == '7' || cTrans == '8' || cTrans == '9') && (m_iNumberStatus == NUMBER_PORZERO)) {
+            } else if (Character.isDigit(cTrans) && (m_iNumberStatus == NUMBER_PORZERO)) {
                 m_jPor.setText("x" + Character.toString(cTrans));
                 m_iNumberStatus = NUMBER_PORINT;
                 m_iNumberStatusPor = NUMBERVALID;
-            } else if ((cTrans == '0' || cTrans == '1' || cTrans == '2' || cTrans == '3' || cTrans == '4' || cTrans == '5' || cTrans == '6' || cTrans == '7' || cTrans == '8' || cTrans == '9') && (m_iNumberStatus == NUMBER_PORINT)) {
+            } else if (Character.isDigit(cTrans) && (m_iNumberStatus == NUMBER_PORINT)) {
                 m_jPor.setText(m_jPor.getText() + cTrans);
             } else if (cTrans == '.' && m_iNumberStatus == NUMBER_PORZERO && !priceWith00) {
                 m_jPor.setText("x0.");
@@ -1401,7 +1401,7 @@ public abstract class JPanelTicket extends JPanel implements JPanelView, BeanFac
                 m_iNumberStatus = NUMBERVALID;
             } else if ((cTrans == '0') && (m_iNumberStatus == NUMBER_PORZERODEC || m_iNumberStatus == NUMBER_PORDEC)) {
                 m_jPor.setText(m_jPor.getText() + cTrans);
-            } else if ((cTrans == '1' || cTrans == '2' || cTrans == '3' || cTrans == '4' || cTrans == '5' || cTrans == '6' || cTrans == '7' || cTrans == '8' || cTrans == '9')
+            } else if (Character.isDigit(cTrans)
                     && (m_iNumberStatus == NUMBER_PORZERODEC || m_iNumberStatus == NUMBER_PORDEC)) {
                 m_jPor.setText(m_jPor.getText() + cTrans);
                 m_iNumberStatus = NUMBER_PORDEC;
@@ -1581,8 +1581,7 @@ public abstract class JPanelTicket extends JPanel implements JPanelView, BeanFac
                             try {
                                 JRefundLines.updateRefunds();
                             } catch (BasicException ex) {
-                                //  Logger.getLogger(JPanelTicket.class.getName()).log(Level.SEVERE, null, ex);
-                                System.out.println();
+                                Logger.getLogger(JPanelTicket.class.getName()).log(Level.SEVERE, null, ex);
                             }
                         }
                         m_ticketsbag.deleteTicket();
@@ -1597,6 +1596,8 @@ public abstract class JPanelTicket extends JPanel implements JPanelView, BeanFac
                 } else {
                     Toolkit.getDefaultToolkit().beep();
                 }
+            } else if(!Character.isDigit(cTrans)) {
+                m_iNumberStatusInput = NUMBERINVALID;
             }
         }
     }

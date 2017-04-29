@@ -52,7 +52,7 @@ public class JResetPickupID extends javax.swing.JFrame {
             this.setIconImage(ImageIO.read(JRootFrame.class.getResourceAsStream("/uk/chromis/fixedimages/smllogo.png")));
         } catch (IOException e) {
         }
-        setTitle(AppLocal.APP_NAME + " - " + AppLocal.APP_VERSION + " - " + AppLocal.getIntString("Menu.Resetpickup"));
+        setTitle(AppLocal.APP_NAME + " - " + AppLocal.APP_VERSION + " - " + AppLocal.APP_BUILD + AppLocal.APP_DEMO + " - " + AppLocal.getIntString("Menu.Resetpickup"));
 
         addWindowListener(new MyFrameListener());
 

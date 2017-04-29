@@ -109,6 +109,9 @@
     <!-- <event key="ticket.close" code="event.close"/> -->  
     <!-- <event key="ticket.pretotals" code="script.ServiceCharge" /> -->
 
+    <!-- Custom scan code processor script  -->
+    <!-- <event key="script.CustomCodeProcessor" code="script.CustomCodeProcessor"/> -->
+    
     <!-- <taxcategoryid value="001"/> -->
     <!-- <pricevisible value="true" /> -->
          

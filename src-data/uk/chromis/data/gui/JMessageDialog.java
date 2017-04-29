@@ -76,7 +76,7 @@ public class JMessageDialog extends javax.swing.JDialog {
         myMsg.jlblErrorCode.setText(inf.getErrorCodeMsg());
         myMsg.jlblMessage.setText("<html>" + inf.getMessageMsg());
         
-        myMsg.setTitle(LocalRes.getIntString("title.message") + " - " + AppLocal.APP_VERSION);
+        myMsg.setTitle(LocalRes.getIntString("title.message") + " - " + AppLocal.APP_VERSION + " - " + AppLocal.APP_BUILD + AppLocal.APP_DEMO);
         
         
         // Capturamos el texto de la excepcion...
