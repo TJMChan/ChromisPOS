@@ -1,21 +1,23 @@
-
-28th April 2017(TJMChan)
-- Added custom build information
-- Fixed removal of Aux items.
-- Fixed EAN13 & UPC barcode processing
+***********************************************************************************************************
+29th April 2017(TJMChan) - Wildfox Build 1704v1 for End of April Release
+Added Custom scan Code handler and code fixes
 - Added custom scan code processing script(Beanshell) hook.
   Notes for custom scan code processing:     
     - the code will be passed into the script using a String variable called 
 	"sCode" to be process or decoded
-    - Requires an event key call ticket.customecodeprocessor to link it to 
+    - Requires an event key call script.CustomeCodeProcessor to link it to 
 	code script(same way as ticket.close and other beanshell scripts)
-   	ie. <event key="ticket.customcodeprocessor" code="<resource name>"/>
-    - code script must return a valid TicketLineInfo class for insertion 
+   	ie. <event key="script.CustomCodeProcessor" code="<resource name>"/>
+    - the code script must return a valid TicketLineInfo class for insertion 
 	to ticket on success
-- Added sample custom partial GS1 barcode script Ticket.CustomBarcodeHandler.bsh
+- Added sample custom partial GS1 barcode processor script script.CustomCodeProcessor.bsh
   that can be used in above hook.
+- Added custom build information
+- Fixed removal of Aux items.
+- Fixed EAN13 & UPC barcode processing
 - Fixed valid number check in ticket sales panel
-- modified source to allow Chromis to run on early release of Java 9
+- Fixed source to allow Chromis to run on early release of Java 9
+- Added README.md file
 
 ***********************************************************************************************************
 17th January 2017(TJMChan)
