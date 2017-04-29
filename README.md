@@ -1,6 +1,6 @@
 ## Chromis POS
 
-Source code for Wildfox Edition 1704v1 build of Chromis POS Application Version 0.56.2 
+Source code for Wildfox Build 1704v1 build of Chromis POS Application Version 0.56.2 
 
 <center>
  <img src="Polished_Layout_1_sm.png"> <img src="Polished_Layout_2_sm.png"> <img src="Polished_Layout_3_sm.png">
@@ -46,7 +46,7 @@ chromis program's lib directory.
 
 ### Notes for updating from an older Chromis POS database to 0.56.2 
 If you used this jar to update from a Unicenta or a previous version of Chromis POS,
- you will encounter Liquidbase change set checksum issues when doing so or when updating
+ you may encounter Liquidbase change set checksum issues when doing so or when updating
 to the next version of Chromis POS.
  
 This will likely involve these 2 update keys <b>Drop LEAVES_PPLID</b> and <b>Add LEAVES_PPLID</b>
@@ -59,11 +59,11 @@ the MD5SUM to null for these 2 entries by using the following SQL commands:
 ### Notes for custom scan code processor script
 This custom code of Chromis POS supports custom scan code handling routine. 
 If you want to use this, you will have to setup the event key called 
-<b>ticket.customercodeprocessor</b> to link to your code script. 
+<b>script.CustomerCodeProcessor</b> to link to your code script. 
 I have added a sample script in the template directory which you can add to your resources. 
 The code will be passed into the script using a String variable called <b>sCode</b> for processing. 
 
-I have included a sample script <b>Ticket.CustomBarcodeHandler.bsh</b> in uk.chromis.pos.templates directory as a reference. 
+I have included a sample script <b>script.CustomCodeProcessor.bsh</b> in uk.chromis.pos.templates directory as a reference. 
 This script is a partial GS1 standard code processor implementation to store the Expiry and Lot within the ticket line attributes.
 On success the script will return a valid TicketLineInfo class with the expiry data or lot number within its attributes if either is available.
 On failure the script will return nothing.
