@@ -59,7 +59,7 @@ the MD5SUM to null for these 2 entries by using the following SQL commands:
 ### Notes for custom scan code processor script
 This custom code of Chromis POS supports custom scan code handling routine. 
 If you want to use this, you will have to setup the event key called 
-<b>script.CustomerCodeProcessor</b> to link to your code script. 
+<b>script.CustomCodeProcessor</b> to link to your code script. 
 I have added a sample script in the template directory which you can add to your resources. 
 The code will be passed into the script using a String variable called <b>sCode</b> for processing. 
 
