@@ -2794,8 +2794,11 @@ public abstract class JPanelTicket extends JPanel implements JPanelView, BeanFac
             ticket2.setCustomer(m_oTicket.getCustomer());
 
             if (splitdialog.showDialog(ticket1, ticket2, m_oTicketExt)) {
+                executeEvent(ticket2, m_oTicketExt, "ticket.change");
                 if (closeTicket(ticket2, m_oTicketExt)) {
                     setActiveTicket(ticket1, m_oTicketExt);
+                    executeEventAndRefresh("ticket.pretotals");
+                    executeEventAndRefresh("ticket.change");
                 }
             }
         }

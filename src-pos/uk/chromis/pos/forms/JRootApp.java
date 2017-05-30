@@ -1104,10 +1104,10 @@ public class JRootApp extends JPanel implements AppView {
                     .getName()).log(Level.SEVERE, null, ex);
         }
 
-        /*
         int mb = 1024*1024;         
         //Getting the runtime reference from system
         Runtime runtime = Runtime.getRuntime();         
+        /*
         System.out.println("##### Heap utilization statistics [MB] #####");         
         //Print used memory
         System.out.println("Used Memory:"
@@ -1132,6 +1132,11 @@ public class JRootApp extends JPanel implements AppView {
         model.addRow(new Object[]{"Java Version", System.getProperty("java.version")});
         model.addRow(new Object[]{"Jar MD5", md5});
         model.addRow(new Object[]{"Operating System", System.getProperty("os.name")});
+        model.addRow(new Object[]{"Memory Used",  ((runtime.totalMemory() - runtime.freeMemory()) / mb)+" MB"});
+        model.addRow(new Object[]{"Total Memory Allocated", (runtime.totalMemory() / mb)+" MB"});
+        model.addRow(new Object[]{"Max. Memory Available",  (runtime.maxMemory() / mb)+" MB"});
+        model.addRow(new Object[]{"Thread Count",  java.lang.management.ManagementFactory.getThreadMXBean().getThreadCount()});
+        model.addRow(new Object[]{"Available Processors",  runtime.availableProcessors()});
 
         JScrollPane scrollPane = new JScrollPane(table);
         JPanel mainPanel = new JPanel(layout);
@@ -1145,9 +1150,9 @@ public class JRootApp extends JPanel implements AppView {
         mainPanel.add(btnPanel, "right, wrap");
         mainPanel.add(new JLabel(), "wrap");
         sampleFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        sampleFrame.setPreferredSize(new Dimension(500, 300));
+        sampleFrame.setPreferredSize(new Dimension(500, 400));
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-        sampleFrame.setLocation(dim.width / 2 - 250, dim.height / 2 - 150);
+        sampleFrame.setLocation(dim.width / 2 - 250, dim.height / 2 - 200);
         sampleFrame.setUndecorated(true);
         mainPanel.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0), 4));
         sampleFrame.add(mainPanel);

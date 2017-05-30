@@ -1,3 +1,15 @@
+30th May 2017(TJMChan) - Wildfox Build 1705v1 for End of May Release
+- Added ability to search by Barcode in Product Location/Warehouse Panel
+- Expanded sort function to include barcode, stock level, min and max values.
+- Added "ticket.pretotals" and "ticket.change" hooks for splitting ticket lines in sales 
+- Adjusted Ticket.Buttons.xml template to relinked script.ServiceCharge to ticket.change instead of ticket.total
+- Fixed Product Attributes List by adding a null value at the front of the list
+- Fixed script.ServiceCharge template
+- Fixed Customer discount issue in Customer Panel
+- Adjusted name in Layway list to include Pickup ID if assigned.
+- Cleanup code in JTicketsBagShared.java
+- Added runtime stats to info box
+
 ***********************************************************************************************************
 29th April 2017(TJMChan) - Wildfox Build 1704v1 for End of April Release
 Added Custom scan Code handler and code fixes

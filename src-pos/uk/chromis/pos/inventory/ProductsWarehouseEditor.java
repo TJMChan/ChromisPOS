@@ -58,6 +58,8 @@ public class ProductsWarehouseEditor extends javax.swing.JPanel implements Edito
      */
     public Object location;
     
+    public Object code;
+    
     /** Creates new form ProductsWarehouseEditor
      * @param dirty */
     public ProductsWarehouseEditor(DirtyManager dirty) {
@@ -83,6 +85,7 @@ public class ProductsWarehouseEditor extends javax.swing.JPanel implements Edito
         m_jMaximum.setText(null);
         m_jMinimum.setEnabled(false);
         m_jMaximum.setEnabled(false);
+        code = null;
     }
 
     /**
@@ -101,6 +104,7 @@ public class ProductsWarehouseEditor extends javax.swing.JPanel implements Edito
         m_jMaximum.setText(null);
         m_jMinimum.setEnabled(true);
         m_jMaximum.setEnabled(true);
+        code = null;
     }
 
     /**
@@ -121,6 +125,7 @@ public class ProductsWarehouseEditor extends javax.swing.JPanel implements Edito
         m_jMaximum.setText(Formats.DOUBLE.formatValue(myprod[6]));
         m_jMinimum.setEnabled(true);
         m_jMaximum.setEnabled(true);
+        code = myprod[8];
      }
 
     /**
@@ -141,6 +146,7 @@ public class ProductsWarehouseEditor extends javax.swing.JPanel implements Edito
         m_jMaximum.setText(Formats.DOUBLE.formatValue(myprod[6]));
         m_jMinimum.setEnabled(false);
         m_jMaximum.setEnabled(false);
+        code = myprod[8];
     }
 
     /**
@@ -158,7 +164,8 @@ public class ProductsWarehouseEditor extends javax.swing.JPanel implements Edito
             location,
             Formats.DOUBLE.parseValue(m_jMinimum.getText()),
             Formats.DOUBLE.parseValue(m_jMaximum.getText()),
-            Formats.DOUBLE.parseValue(m_jQuantity.getText())
+            Formats.DOUBLE.parseValue(m_jQuantity.getText()),
+            code
         };
     }
     

@@ -1,6 +1,6 @@
 ## Chromis POS
 
-Source code for Wildfox Build 1704v1 build of Chromis POS Application Version 0.56.2 
+Source code for Wildfox Build 1705v1 build of Chromis POS Application Version 0.56.2 
 
 <center>
  <img src="Polished_Layout_1_sm.png"> <img src="Polished_Layout_2_sm.png"> <img src="Polished_Layout_3_sm.png">
@@ -8,6 +8,7 @@ Source code for Wildfox Build 1704v1 build of Chromis POS Application Version 0.
 
 ### Additional Fixes and Supported Features
 
+* Added ability to search for product based on barcode and expanded sort to include barcode, stock,min, and max in Product Location/Warehouse Panel
 * Ability to add custom scan code handling for coupons or products(see README.txt).
 * Syntax Highlighting in resource editor (provided by Jacob Mellin fork)
 * Printer Template fixes (see README.txt)
@@ -16,8 +17,12 @@ Source code for Wildfox Build 1704v1 build of Chromis POS Application Version 0.
 * Hide catalog icons on sales screen (see README.txt)
 * Additional 3 Sales Screens Layouts
 * Network connection timeout drop recovery
+* Rearranged executions of "ticket.pretotals" and "ticket.change" script hooks in JPanelTicket
+* Fixed Product Attribute list on sales screen
+* Fixed script.ServiceCharge Template
 * Fixed Stock level retrievals
 * Fixed number checking on sales screen
+* Fixed Customer Discount issue in Customer Panel
 
 ### Building JAR file
 

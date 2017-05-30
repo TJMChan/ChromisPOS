@@ -70,14 +70,16 @@ public class ProductsWarehousePanel extends JPanelTable2 {
                 new Field(AppLocal.getIntString("label.prodref"), Datas.STRING, Formats.STRING, true, true, true),
                 new Field(AppLocal.getIntString("label.prodname"), Datas.STRING, Formats.STRING, true, true, true),
                 new Field("LOCATION", Datas.STRING, Formats.STRING),
-                new Field("STOCKSECURITY", Datas.DOUBLE, Formats.DOUBLE),
-                new Field("STOCKMAXIMUM", Datas.DOUBLE, Formats.DOUBLE),
-                new Field("UNITS", Datas.DOUBLE, Formats.DOUBLE)
+                new Field(AppLocal.getIntString("label.minimum"), Datas.DOUBLE, Formats.DOUBLE, false, false, true),
+                new Field(AppLocal.getIntString("label.maximum"), Datas.DOUBLE, Formats.DOUBLE, false, false, true),
+                new Field(AppLocal.getIntString("label.stockunits"), Datas.DOUBLE, Formats.DOUBLE, false, false, true),
+                new Field(AppLocal.getIntString("label.prodbarcode"), Datas.STRING, Formats.STRING, false, true, true)
         );
 
         lpr = new ListProviderCreator(new PreparedSentence(app.getSession(),
                 "SELECT L.ID, P.ID, P.REFERENCE, P.NAME," +
-                "L.STOCKSECURITY, L.STOCKMAXIMUM, COALESCE(S.SUMUNITS, 0) " +
+                "L.STOCKSECURITY, L.STOCKMAXIMUM, COALESCE(S.SUMUNITS, 0), " +
+                "P.CODE " +
                 "FROM PRODUCTS P " +
                 "LEFT OUTER JOIN (SELECT ID, PRODUCT, LOCATION, STOCKSECURITY, STOCKMAXIMUM FROM STOCKLEVEL WHERE LOCATION = ?) L ON P.ID = L.PRODUCT " +
                 "LEFT OUTER JOIN (SELECT PRODUCT, SUM(UNITS) AS SUMUNITS FROM STOCKCURRENT WHERE LOCATION = ? GROUP BY PRODUCT) S ON P.ID = S.PRODUCT " +
@@ -171,7 +173,8 @@ public class ProductsWarehousePanel extends JPanelTable2 {
                 ((Object[]) m_paramslocation.createValue())[1],
                 dr.getDouble(5),
                 dr.getDouble(6),
-                dr.getDouble(7)
+                dr.getDouble(7),
+                dr.getString(8)
             };
         }
     }

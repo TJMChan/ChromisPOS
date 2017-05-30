@@ -18,7 +18,6 @@
 //    along with Chromis POS.  If not, see <http://www.gnu.org/licenses/>.
 package uk.chromis.pos.sales.shared;
 
-import java.io.File;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -49,7 +48,6 @@ public class JTicketsBagShared extends JTicketsBag {
 
     private String m_sCurrentTicket = null;
     private DataLogicReceipts dlReceipts = null;
-    private DataLogicAdmin dlAdmin;
     private DataLogicSales dlSales;
 
     /**
@@ -63,7 +61,6 @@ public class JTicketsBagShared extends JTicketsBag {
         super(app, panelticket);
 
         dlReceipts = (DataLogicReceipts) app.getBean("uk.chromis.pos.sales.DataLogicReceipts");
-        dlAdmin = (DataLogicAdmin) app.getBean("uk.chromis.pos.admin.DataLogicAdmin");
         dlSales = (DataLogicSales) app.getBean("uk.chromis.pos.forms.DataLogicSales");
 
         initComponents();
@@ -134,19 +131,13 @@ public class JTicketsBagShared extends JTicketsBag {
         if (m_sCurrentTicket != null) {
             try {
                 if (AppConfig.getInstance().getBoolean("till.usepickupforlayaway")) {
-                    // test if ticket as pickupid
-                    if (m_panelticket.getActiveTicket().getPickupId() == 0) {
-                        m_panelticket.getActiveTicket().setSharedTicket(Boolean.TRUE);
-                        // Only assign a pickupid if ticket has an article count
-                        if (m_panelticket.getActiveTicket().getArticlesCount() > 0) {
-                            dlReceipts.insertSharedTicketUsingPickUpID(m_sCurrentTicket, m_panelticket.getActiveTicket(), dlSales.getNextPickupIndex());
-                        } else {
-                            dlReceipts.insertSharedTicketUsingPickUpID(m_sCurrentTicket, m_panelticket.getActiveTicket(), 0);
-                        }
-                    } else {
-                        m_panelticket.getActiveTicket().setSharedTicket(Boolean.TRUE);
-                        dlReceipts.insertSharedTicketUsingPickUpID(m_sCurrentTicket, m_panelticket.getActiveTicket(), m_panelticket.getActiveTicket().getPickupId());
-                    }
+                    // test if ticket as pickupid snd Only assign a pickupid if ticket has an article count
+                    if ((m_panelticket.getActiveTicket().getPickupId() == 0) &&
+                            (m_panelticket.getActiveTicket().getArticlesCount() > 0)) {
+                        m_panelticket.getActiveTicket().setPickupId(dlSales.getNextPickupIndex());
+                    } 
+                    m_panelticket.getActiveTicket().setSharedTicket(Boolean.TRUE);
+                    dlReceipts.insertSharedTicketUsingPickUpID(m_sCurrentTicket, m_panelticket.getActiveTicket(), m_panelticket.getActiveTicket().getPickupId());
                 } else {
                     m_panelticket.getActiveTicket().setSharedTicket(Boolean.TRUE);
                     dlReceipts.insertSharedTicket(m_sCurrentTicket, m_panelticket.getActiveTicket(), m_panelticket.getActiveTicket().getPickupId());
@@ -194,10 +185,6 @@ public class JTicketsBagShared extends JTicketsBag {
             } else {
                 nl = dlReceipts.getSharedTicketList();
             }
-            //       if (Integer.parseInt(dlAdmin.getRightsLevelByID(m_App.getAppUserView().getUser().getRole())) <= (Integer.parseInt(m_config.getProperty("delete.rightslevel")))) {
-            //       } else {
-            //           nl = dlReceipts.getSharedTicketList();
-            //       }
 
             if (nl.isEmpty()) {
                 m_jListTickets.setText("");
@@ -214,31 +201,6 @@ public class JTicketsBagShared extends JTicketsBag {
 
     private void selectValidTicket() {
 
-        /*
-        AppConfig m_config = new AppConfig(new File((System.getProperty("user.home")), AppLocal.APP_ID + ".properties"));
-        m_config.load();
-        List<SharedTicketInfo> l;
-        try {
-            if ("true".equals(m_config.getProperty("sharedticket.currentuser"))) {
-                l = dlReceipts.getSharedTicketListByUser(m_App.getAppUserView().getUser().getName());
-            } else {
-                l = dlReceipts.getSharedTicketList();
-            }
-      //      if (Integer.parseInt(dlAdmin.getRightsLevelByID(m_App.getAppUserView().getUser().getRole())) <= (Integer.parseInt(m_config.getProperty("delete.rightslevel")))) {
-            //      } else {
-            //          l = dlReceipts.getSharedTicketList();
-            //      }
-            checkLayaways();
-            if (l.isEmpty()) {
-                newTicket();
-            } else {
-                setActiveTicket(l.get(l.size() - 1).getId());
-            }
-        } catch (BasicException e) {
-            new MessageInf(e).show(this);
-            checkLayaways();
-            newTicket();
-        }*/
         newTicket();
        // AutoLogoff.getInstance().deactivateTimer();
         if (AppConfig.getInstance().getBoolean("till.layawaypopup")) {
@@ -352,10 +314,6 @@ public class JTicketsBagShared extends JTicketsBag {
                     } else {
                         l = dlReceipts.getSharedTicketList();
                     }
-                    //             if (Integer.parseInt(dlAdmin.getRightsLevelByID(m_App.getAppUserView().getUser().getRole())) <= (Integer.parseInt(m_config.getProperty("delete.rightslevel")))) {
-                    //             } else {
-                    //                 l = dlReceipts.getSharedTicketList();
-                    //             }
                     JTicketsBagSharedList listDialog = JTicketsBagSharedList.newJDialog(JTicketsBagShared.this);
                     String id = listDialog.showTicketsList(l);
 
@@ -363,8 +321,6 @@ public class JTicketsBagShared extends JTicketsBag {
                         saveCurrentTicket();
                         m_sCurrentTicket = id;
                         setActiveTicket(id);
-                        // m_jTicketId.setText()
-
                     }
                 } catch (BasicException e) {
                     new MessageInf(e).show(JTicketsBagShared.this);

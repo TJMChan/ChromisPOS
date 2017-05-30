@@ -298,12 +298,17 @@ public final class TicketInfo implements SerializableRead, Externalizable {
      */
     public String getName(Object info) {
         StringBuilder name = new StringBuilder();
-
+        
         if (m_User != null) {
             name.append(m_User.getName());
             name.append(" - ");
         }
 
+        if (m_iPickupId>0) {
+            name.append(" ");
+            name.append(m_iPickupId);
+        }
+            
         if (info == null) {
             if (m_iTicketId == 0) {
                 name.append("(").append(m_dateformat.format(m_dDate)).append(" ").append(Long.toString(m_dDate.getTime() % 1000)).append(")");
