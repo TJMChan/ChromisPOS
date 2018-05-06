@@ -1,6 +1,6 @@
 ## Chromis POS
 
-Source code for Wildfox Build 1705v1 build of Chromis POS Application Version 0.56.2 
+Source code for Wildfox Build 1805v1 build of Chromis POS Application Version 0.56.2 
 
 <center>
  <img src="Polished_Layout_1_sm.png"> <img src="Polished_Layout_2_sm.png"> <img src="Polished_Layout_3_sm.png">
@@ -23,7 +23,8 @@ Source code for Wildfox Build 1705v1 build of Chromis POS Application Version 0.
 * Fixed Stock level retrievals
 * Fixed number checking on sales screen
 * Fixed Customer Discount issue in Customer Panel
-
+* Fixed bug #156, where the use of auto table refresh in restaurant mode causes free heap memory to be used up over time causing Chromis to hang
+ 
 ### Building JAR file
 
 See [Netbeans Installation Manual](https://sourceforge.net/projects/chromispos/files/Source%20Code/)

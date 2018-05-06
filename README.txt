@@ -1,3 +1,10 @@
+06th May 2018(TJMChan) - Wildfox Build 1805v1 release to fix bug #156
+This release fixes bug #156(https://sourceforge.net/p/chromispos/bugs/156/) which causes Chromis to hang when
+auto refresh tables is enabled in restaurant mode.
+- Fixed RestaurantDBUtils.java
+- Added more currency symbols to configuration
+
+***********************************************************************************************************
 30th May 2017(TJMChan) - Wildfox Build 1705v1 for End of May Release
 - Added ability to search by Barcode in Product Location/Warehouse Panel
 - Expanded sort function to include barcode, stock level, min and max values.

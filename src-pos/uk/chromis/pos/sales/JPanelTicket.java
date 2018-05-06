@@ -563,7 +563,7 @@ public abstract class JPanelTicket extends JPanel implements JPanelView, BeanFac
         if ((m_oTicket != null) && (((AppConfig.getInstance().getBoolean("table.showcustomerdetails"))
                 || (AppConfig.getInstance().getBoolean("table.showwaiterdetails"))))) {
 // check if the old table and the new table are the same                      
-            if (restDB.getTableMovedFlag(m_oTicket.getId())) {
+            if (restDB.getTableMovedName(m_oTicket.getId())!=null) {
                 restDB.moveCustomer(oTicketExt.toString(), m_oTicket.getId());
             }
         }

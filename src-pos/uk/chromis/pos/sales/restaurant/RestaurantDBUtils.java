@@ -1,5 +1,5 @@
 //    Chromis POS  - The New Face of Open Source POS
-//    Copyright (c) (c) 2015-2016
+//    Copyright (c) 2015 
 //    http://www.chromis.co.uk
 //
 //    This file is part of Chromis POS
@@ -16,34 +16,34 @@
 //
 //    You should have received a copy of the GNU General Public License
 //    along with Chromis POS.  If not, see <http://www.gnu.org/licenses/>.
-
 package uk.chromis.pos.sales.restaurant;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import uk.chromis.data.loader.Datas;
+import uk.chromis.data.loader.PreparedSentence;
+import uk.chromis.data.loader.SerializerReadString;
+import uk.chromis.data.loader.SerializerReadInteger;
+import uk.chromis.data.loader.SerializerWriteBasic;
+import uk.chromis.data.loader.SerializerWriteString;
 import uk.chromis.data.loader.Session;
+import uk.chromis.data.loader.StaticSentence;
 import uk.chromis.pos.forms.AppView;
 import uk.chromis.pos.forms.DataLogicSystem;
-
-
-
 
 /**
  *
  * @author JDL
+ * 
+ * Fixed by TJMChan on 2018-May-06
+ * 
  */
-
-
 public class RestaurantDBUtils {
-    private Session s;
-    private Connection con;  
-    private Statement stmt;
-    private PreparedStatement pstmt;
-    private String SQL;
-    private ResultSet rs;
+
+    public final static int TRUE = 1;
+    public final static int FALSE = 0;
+    private Session m_s;
+    private Object m_result;
     private AppView m_App;
 
     /**
@@ -56,18 +56,8 @@ public class RestaurantDBUtils {
      * @param oApp
      */
     public RestaurantDBUtils(AppView oApp) {
-        m_App=oApp;
-        
-                              
-//get database connection details        
-       try{
-            s=m_App.getSession();
-            con=s.getConnection();                      
-        }
-        catch (SQLException e){System.out.print("No session or connection");
-        }
-        
-
+        m_App = oApp;
+        m_s = m_App.getSession();
     }
 
     /**
@@ -75,41 +65,42 @@ public class RestaurantDBUtils {
      * @param newTable
      * @param ticketID
      */
-    public void moveCustomer(String newTable, String ticketID){
-      String oldTable=getTableDetails(ticketID); 
-        if (countTicketIdInTable(ticketID)>1){
-            setCustomerNameInTable(getCustomerNameInTable(oldTable),newTable);
-            setWaiterNameInTable(getWaiterNameInTable(oldTable),newTable);  
-            setTicketIdInTable(ticketID,newTable);
-// remove the data for the old table 
-            oldTable = getTableMovedName(ticketID);  
-                if ((oldTable != null) && (oldTable != newTable)){
-                    clearCustomerNameInTable(oldTable);
-                    clearWaiterNameInTable(oldTable); 
-                    clearTicketIdInTable(oldTable);
-                    clearTableMovedFlag(oldTable);
-                }
-                else{
-                    oldTable = getTableMovedName(ticketID);
-                    clearTableMovedFlag(oldTable);                    
-                }      
+    public void moveCustomer(String newTable, String ticketID) {
+        String oldTable = getTableDetails(ticketID);
+        if (countTicketIdInTable(ticketID) > 1) {
+            setCustomerNameInTable(getCustomerNameInTable(oldTable), newTable);
+            setWaiterNameInTable(getWaiterNameInTable(oldTable), newTable);
+            setTicketIdInTable(ticketID, newTable);
+            // remove the data for the old table 
+            oldTable = getTableMovedName(ticketID);
+            if ((oldTable != null) && (oldTable != newTable)) {
+                clearCustomerNameInTable(oldTable);
+                clearWaiterNameInTable(oldTable);
+                clearTicketIdInTable(oldTable);
+                clearTableMovedFlag(oldTable);
+            } else {
+                oldTable = getTableMovedName(ticketID);
+                clearTableMovedFlag(oldTable);
+            }
+        } else {
+            clearTableMovedFlag(oldTable);
         }
-  }
+    }
 
     /**
      *
      * @param custName
      * @param tableName
      */
-    public void setCustomerNameInTable(String custName, String tableName){
-        try{
-            SQL = "UPDATE PLACES SET CUSTOMER=? WHERE NAME=?";
-            pstmt=con.prepareStatement(SQL);
-            pstmt.setString(1,custName); 
-            pstmt.setString(2,tableName);    
-            pstmt.executeUpdate();
-        }catch(Exception e){
-            }
+    public void setCustomerNameInTable(String custName, String tableName) {
+        try {
+            new StaticSentence(m_s, "UPDATE PLACES SET CUSTOMER=? WHERE NAME=?", new SerializerWriteBasic(new Datas[]{
+                Datas.STRING,
+                Datas.STRING
+            })).exec(custName, tableName);
+        } catch (Exception e) {
+            Logger.getLogger(RestaurantDBUtils.class.getName()).log(Level.WARNING, null, e);
+        }
     }
 
     /**
@@ -117,15 +108,15 @@ public class RestaurantDBUtils {
      * @param custName
      * @param tableID
      */
-    public void setCustomerNameInTableById(String custName, String tableID){
-        try{
-            SQL = "UPDATE PLACES SET CUSTOMER=? WHERE ID=?";
-            pstmt=con.prepareStatement(SQL);
-            pstmt.setString(1,custName); 
-            pstmt.setString(2,tableID);    
-            pstmt.executeUpdate();
-        }catch(Exception e){
-            }
+    public void setCustomerNameInTableById(String custName, String tableID) {
+        try {
+            new StaticSentence(m_s, "UPDATE PLACES SET CUSTOMER=? WHERE ID=?", new SerializerWriteBasic(new Datas[]{
+                Datas.STRING,
+                Datas.STRING
+            })).exec(custName,tableID);
+        } catch (Exception e) {
+            Logger.getLogger(RestaurantDBUtils.class.getName()).log(Level.WARNING, null, e);
+        }
     }
 
     /**
@@ -133,81 +124,75 @@ public class RestaurantDBUtils {
      * @param custName
      * @param ticketID
      */
-    public void setCustomerNameInTableByTicketId(String custName, String ticketID){
-        try{
-            SQL = "UPDATE PLACES SET CUSTOMER=? WHERE TICKETID=?";
-            pstmt=con.prepareStatement(SQL);
-            pstmt.setString(1,custName); 
-            pstmt.setString(2,ticketID);    
-            pstmt.executeUpdate();
-        }catch(Exception e){
-            }
-}
+    public void setCustomerNameInTableByTicketId(String custName, String ticketID) {
+        try {
+            new StaticSentence(m_s, "UPDATE PLACES SET CUSTOMER=? WHERE TICKETID=?", new SerializerWriteBasic(new Datas[]{
+                Datas.STRING,
+                Datas.STRING
+            })).exec(custName,ticketID);
+        } catch (Exception e) {
+            Logger.getLogger(RestaurantDBUtils.class.getName()).log(Level.WARNING, null, e);
+        }
+    }
 
     /**
      *
      * @param tableName
      * @return
      */
-    public String getCustomerNameInTable(String tableName){
-       try{
-            SQL = "SELECT CUSTOMER FROM PLACES WHERE NAME='"+ tableName + "'";   
-            stmt = (Statement) con.createStatement();  
-            rs = stmt.executeQuery(SQL);
-      if (rs.next()){
-            String customer =rs.getString("CUSTOMER");
-            return(customer);
-        }    
-        }catch(Exception e){
-            }   
-       return "";
-  }
+    public String getCustomerNameInTable(String tableName) {
+        try {
+            m_result = new PreparedSentence(m_s,
+                "SELECT CUSTOMER FROM PLACES WHERE NAME = ?",
+                SerializerWriteString.INSTANCE,
+                SerializerReadString.INSTANCE).find(tableName);
+            return(m_result==null?"":(String)m_result);            
+        } catch (Exception e) {
+            Logger.getLogger(RestaurantDBUtils.class.getName()).log(Level.WARNING, null, e);
+        }
+        return "";
+    }
 
     /**
      *
      * @param tableId
      * @return
      */
-    public String getCustomerNameInTableById(String tableId){
-       try{
-            SQL = "SELECT CUSTOMER FROM PLACES WHERE ID='"+ tableId + "'";   
-            stmt = (Statement) con.createStatement();  
-            rs = stmt.executeQuery(SQL);
-      if (rs.next()){
-            String customer =rs.getString("CUSTOMER");
-            return(customer);
-        }    
-        }catch(Exception e){
-            }   
-       return "";
-  }
+    public String getCustomerNameInTableById(String tableId) {
+        try {
+            m_result = new PreparedSentence(m_s,
+                "SELECT CUSTOMER FROM PLACES WHERE ID = ?",
+                SerializerWriteString.INSTANCE,
+                SerializerReadString.INSTANCE).find(tableId);
+            return(m_result==null?"":(String)m_result);            
+        } catch (Exception e) {
+            Logger.getLogger(RestaurantDBUtils.class.getName()).log(Level.WARNING, null, e);
+        }
+        return "";
+    }
 
     /**
      *
      * @param tableName
      */
-    public void clearCustomerNameInTable(String tableName){
-        try{
-            SQL = "UPDATE PLACES SET CUSTOMER=null WHERE NAME=?";
-            pstmt=con.prepareStatement(SQL);
-            pstmt.setString(1,tableName);     
-            pstmt.executeUpdate();
-        }catch(Exception e){
-            }
+    public void clearCustomerNameInTable(String tableName) {
+        try {
+            new StaticSentence(m_s, "UPDATE PLACES SET CUSTOMER=null WHERE NAME=?", SerializerWriteString.INSTANCE).exec(tableName);
+        } catch (Exception e) {
+            Logger.getLogger(RestaurantDBUtils.class.getName()).log(Level.WARNING, null, e);
+        }
     }
 
     /**
      *
      * @param tableID
      */
-    public void clearCustomerNameInTableById(String tableID){
-        try{
-            SQL = "UPDATE PLACES SET CUSTOMER=null WHERE ID=?";
-            pstmt=con.prepareStatement(SQL);
-            pstmt.setString(1,tableID);     
-            pstmt.executeUpdate();
-        }catch(Exception e){
-            }
+    public void clearCustomerNameInTableById(String tableID) {
+        try {
+            new StaticSentence(m_s, "UPDATE PLACES SET CUSTOMER=null WHERE ID=?", SerializerWriteString.INSTANCE).exec(tableID);
+        } catch (Exception e) {
+            Logger.getLogger(RestaurantDBUtils.class.getName()).log(Level.WARNING, null, e);
+        }
     }
 
     /**
@@ -215,31 +200,31 @@ public class RestaurantDBUtils {
      * @param waiterName
      * @param tableName
      */
-    public void setWaiterNameInTable(String waiterName, String tableName){
-        try{
-            SQL = "UPDATE PLACES SET WAITER=? WHERE NAME=?";
-            pstmt=con.prepareStatement(SQL);
-            pstmt.setString(1,waiterName); 
-            pstmt.setString(2,tableName);    
-            pstmt.executeUpdate();
-        }catch(Exception e){
-            }
+    public void setWaiterNameInTable(String waiterName, String tableName) {
+        try {
+            new StaticSentence(m_s, "UPDATE PLACES SET WAITER=? WHERE NAME=?", new SerializerWriteBasic(new Datas[]{
+                Datas.STRING,
+                Datas.STRING
+            })).exec(waiterName,tableName);
+        } catch (Exception e) {
+            Logger.getLogger(RestaurantDBUtils.class.getName()).log(Level.WARNING, null, e);
+        }
     }
-  
+
     /**
      *
      * @param waiterName
      * @param tableID
      */
-    public void setWaiterNameInTableById(String waiterName, String tableID){
-        try{
-            SQL = "UPDATE PLACES SET WAITER=? WHERE ID=?";
-            pstmt=con.prepareStatement(SQL);
-            pstmt.setString(1,waiterName); 
-            pstmt.setString(2,tableID);    
-            pstmt.executeUpdate();
-        }catch(Exception e){
-            }
+    public void setWaiterNameInTableById(String waiterName, String tableID) {
+        try {
+            new StaticSentence(m_s, "UPDATE PLACES SET WAITER=? WHERE ID=?", new SerializerWriteBasic(new Datas[]{
+                Datas.STRING,
+                Datas.STRING
+            })).exec(waiterName, tableID);
+        } catch (Exception e) {
+            Logger.getLogger(RestaurantDBUtils.class.getName()).log(Level.WARNING, null, e);
+        }
     }
 
     /**
@@ -247,233 +232,215 @@ public class RestaurantDBUtils {
      * @param tableName
      * @return
      */
-    public String getWaiterNameInTable(String tableName){
-       try{
-            SQL = "SELECT WAITER FROM PLACES WHERE NAME='"+ tableName + "'";   
-            stmt = (Statement) con.createStatement();  
-            rs = stmt.executeQuery(SQL);
-      if (rs.next()){
-            String waiter =rs.getString("WAITER");
-            return(waiter);
-        }    
-        }catch(Exception e){
-            }   
-       return "";
-  }
+    public String getWaiterNameInTable(String tableName) {
+        try {
+            m_result = new PreparedSentence(m_s,
+                "SELECT WAITER FROM PLACES WHERE NAME = ?",
+                SerializerWriteString.INSTANCE,
+                SerializerReadString.INSTANCE).find(tableName);
+            return(m_result==null?"":(String)m_result);
+        } catch (Exception e) {
+            Logger.getLogger(RestaurantDBUtils.class.getName()).log(Level.WARNING, null, e);
+        }
+        return "";
+    }
 
     /**
      *
      * @param tableID
      * @return
      */
-    public String getWaiterNameInTableById(String tableID){
-       try{
-            SQL = "SELECT WAITER FROM PLACES WHERE ID='"+ tableID + "'";   
-            stmt = (Statement) con.createStatement();  
-            rs = stmt.executeQuery(SQL);
-      if (rs.next()){
-            String waiter =rs.getString("WAITER");
-            return(waiter);
-        }    
-        }catch(Exception e){
-            }   
-       return "";
-  }
-
-    /**
-     *
-     * @param tableName
-     */
-    public void clearWaiterNameInTable(String tableName){
-        try{
-            SQL = "UPDATE PLACES SET WAITER=null WHERE NAME=?";
-            pstmt=con.prepareStatement(SQL);
-            pstmt.setString(1,tableName);     
-            pstmt.executeUpdate();
-        }catch(Exception e){
-            }
-       }
-
-    /**
-     *
-     * @param tableID
-     */
-    public void clearWaiterNameInTableById(String tableID){
-        try{
-            SQL = "UPDATE PLACES SET WAITER=null WHERE ID=?";
-            pstmt=con.prepareStatement(SQL);
-            pstmt.setString(1,tableID);     
-            pstmt.executeUpdate();
-        }catch(Exception e){
-            }
-       }
-
-    /**
-     *
-     * @param ID
-     * @return
-     */
-    public String getTicketIdInTable(String ID){
-       try{
-            SQL = "SELECT TICKETID FROM PLACES WHERE ID='"+ ID + "'";   
-            stmt = (Statement) con.createStatement();  
-            rs = stmt.executeQuery(SQL);
-      if (rs.next()){
-            String customer =rs.getString("TICKETID");
-            return(customer);
-        }    
-        }catch(Exception e){
-            }   
-       return "";
-  }  
-
-    /**
-     *
-     * @param TicketID
-     * @param tableName
-     */
-    public void setTicketIdInTable(String TicketID, String tableName){
-        try{
-            SQL = "UPDATE PLACES SET TICKETID=? WHERE NAME=?";
-            pstmt=con.prepareStatement(SQL);
-            pstmt.setString(1,TicketID); 
-            pstmt.setString(2,tableName);    
-            pstmt.executeUpdate();
-        }catch(Exception e){
-            }
+    public String getWaiterNameInTableById(String tableID) {
+        try {
+            m_result = new PreparedSentence(m_s,
+                "SELECT WAITER FROM PLACES WHERE ID= ?",
+                SerializerWriteString.INSTANCE,
+                SerializerReadString.INSTANCE).find(tableID);
+            return(m_result==null?"":(String)m_result);
+        } catch (Exception e) {
+            Logger.getLogger(RestaurantDBUtils.class.getName()).log(Level.WARNING, null, e);
+        }
+        return "";
     }
 
     /**
      *
      * @param tableName
      */
-    public void clearTicketIdInTable(String tableName){
-        try{
-            SQL = "UPDATE PLACES SET TICKETID=null WHERE NAME=?";
-            pstmt=con.prepareStatement(SQL);
-            pstmt.setString(1,tableName);     
-            pstmt.executeUpdate();
-        }catch(Exception e){
-            }
-       }
+    public void clearWaiterNameInTable(String tableName) {
+        try {
+            new StaticSentence(m_s, "UPDATE PLACES SET WAITER=null WHERE NAME=?", SerializerWriteString.INSTANCE).exec(tableName);
+        } catch (Exception e) {
+            Logger.getLogger(RestaurantDBUtils.class.getName()).log(Level.WARNING, null, e);
+        }
+    }
 
     /**
      *
      * @param tableID
      */
-    public void clearTicketIdInTableById(String tableID){
-        try{
-            SQL = "UPDATE PLACES SET TICKETID=null WHERE ID=?";
-            pstmt=con.prepareStatement(SQL);
-            pstmt.setString(1,tableID);     
-            pstmt.executeUpdate();
-        }catch(Exception e){
-            }
-       }
+    public void clearWaiterNameInTableById(String tableID) {
+        try {
+            new StaticSentence(m_s, "UPDATE PLACES SET WAITER=null WHERE ID=?", SerializerWriteString.INSTANCE).exec(tableID);
+        } catch (Exception e) {
+            Logger.getLogger(RestaurantDBUtils.class.getName()).log(Level.WARNING, null, e);
+        }
+    }
+
+    /**
+     *
+     * @param tableID
+     * @return
+     */
+    public String getTicketIdInTable(String tableID) {
+        try {
+            m_result = new PreparedSentence(m_s,
+                "SELECT TICKETID FROM PLACES WHERE ID = ?",
+                SerializerWriteString.INSTANCE,
+                SerializerReadString.INSTANCE).find(tableID);
+            return(m_result==null?"":(String)m_result);      
+        } catch (Exception e) {
+            Logger.getLogger(RestaurantDBUtils.class.getName()).log(Level.WARNING, null, e);
+        }
+        return "";
+    }
 
     /**
      *
      * @param ticketID
-     * @return
+     * @param tableName
      */
-    public Integer countTicketIdInTable(String ticketID){
-      try{
-            SQL = "SELECT COUNT(*) AS RECORDCOUNT FROM PLACES WHERE TICKETID='"+ ticketID + "'";   
-            stmt = (Statement) con.createStatement();  
-            rs = stmt.executeQuery(SQL);
-      if (rs.next()){
-            Integer count =rs.getInt("RECORDCOUNT");
-            return(count);
-        }    
-        }catch(Exception e){
-            }
-     
-     return 0;
- }
+    public void setTicketIdInTable(String ticketID, String tableName) {
+        try {
+            new StaticSentence(m_s, "UPDATE PLACES SET TICKETID=? WHERE NAME=?", new SerializerWriteBasic(new Datas[]{
+                Datas.STRING,
+                Datas.STRING
+            })).exec(ticketID, tableName);
+        } catch (Exception e) {
+            Logger.getLogger(RestaurantDBUtils.class.getName()).log(Level.WARNING, null, e);
+        }
+    }
 
     /**
      *
-     * @param ticketID
-     * @return
+     * @param tableName
      */
-    public String getTableDetails (String ticketID){
-       try{
-            SQL = "SELECT NAME FROM PLACES WHERE TICKETID='"+ ticketID + "'";   
-            stmt = (Statement) con.createStatement();  
-            rs = stmt.executeQuery(SQL);
-      if (rs.next()){
-            String name =rs.getString("NAME");
-            return(name);
-        }    
-        }catch(Exception e){
-            }
-       return "";
-   }
+    public void clearTicketIdInTable(String tableName) {
+        try {
+            new StaticSentence(m_s, "UPDATE PLACES SET TICKETID=null WHERE NAME=?", SerializerWriteString.INSTANCE).exec(tableName);
+        } catch (Exception e) {
+            Logger.getLogger(RestaurantDBUtils.class.getName()).log(Level.WARNING, null, e);
+        }
+    }
 
     /**
      *
      * @param tableID
      */
-    public void setTableMovedFlag (String tableID){
-        try{
-            SQL = "UPDATE PLACES SET TABLEMOVED='true' WHERE ID=?";
-            pstmt=con.prepareStatement(SQL);
-            pstmt.setString(1,tableID);     
-            pstmt.executeUpdate();
-        }catch(Exception e){
-            }
-       }
+    public void clearTicketIdInTableById(String tableID) {
+        try {
+            new StaticSentence(m_s, "UPDATE PLACES SET TICKETID=null WHERE ID=?", SerializerWriteString.INSTANCE).exec(tableID);
+        } catch (Exception e) {
+            Logger.getLogger(RestaurantDBUtils.class.getName()).log(Level.WARNING, null, e);
+        }
+    }
 
     /**
      *
      * @param ticketID
      * @return
      */
-    public String getTableMovedName (String ticketID){
-       try{
-            SQL = "SELECT NAME FROM PLACES WHERE TICKETID='"+ ticketID + "' AND TABLEMOVED ='true'";   
-            stmt = (Statement) con.createStatement();  
-            rs = stmt.executeQuery(SQL);
-      if (rs.next()){
-            String name =rs.getString("NAME");
-            return(name);
-        }    
-        }catch(Exception e){
-            }
-       return null;
-       }  
+    public Integer countTicketIdInTable(String ticketID) {
+        try {
+            m_result = new PreparedSentence(m_s,
+                "SELECT COUNT(*) AS RECORDCOUNT FROM PLACES WHERE TICKETID = ?",
+                SerializerWriteString.INSTANCE,
+                SerializerReadInteger.INSTANCE).find(ticketID);
+            return (Integer) m_result;
+        } catch (Exception e) {
+            Logger.getLogger(RestaurantDBUtils.class.getName()).log(Level.WARNING, null, e);
+        }
+
+        return 0;
+    }
 
     /**
      *
      * @param ticketID
      * @return
      */
-    public Boolean getTableMovedFlag (String ticketID){
-       try{
-            SQL = "SELECT TABLEMOVED FROM PLACES WHERE TICKETID='"+ ticketID + "'";   
-            stmt = (Statement) con.createStatement();  
-            rs = stmt.executeQuery(SQL);
-      if (rs.next()){
-            return(rs.getBoolean("TABLEMOVED"));
-        }    
-        }catch(Exception e){
-            }
-       return (false);
-       }
+    public String getTableDetails(String ticketID) {
+        try {
+            m_result=new PreparedSentence(m_s,
+                "SELECT NAME FROM PLACES WHERE TICKETID = ?",
+                SerializerWriteString.INSTANCE,
+                SerializerReadString.INSTANCE).find(ticketID);
+            return(m_result==null?"":(String)m_result);
+        } catch (Exception e) {
+            Logger.getLogger(RestaurantDBUtils.class.getName()).log(Level.WARNING, null, e);
+        }
+        return "";
+    }
 
     /**
      *
      * @param tableID
      */
-    public void clearTableMovedFlag (String tableID){
-        try{
-            SQL = "UPDATE PLACES SET TABLEMOVED='false' WHERE NAME=?";
-            pstmt=con.prepareStatement(SQL);
-            pstmt.setString(1,tableID);     
-            pstmt.executeUpdate();
-        }catch(Exception e){
-            }
-       }  
- 
+    public void setTableMovedFlag(String tableID) {
+        try {
+            new StaticSentence(m_s, "UPDATE PLACES SET TABLEMOVED=" + TRUE + " WHERE ID=?", SerializerWriteString.INSTANCE).exec(tableID);
+        } catch (Exception e) {
+            Logger.getLogger(RestaurantDBUtils.class.getName()).log(Level.WARNING, null, e);
+        }
+    }
+
+    /**
+     *
+     * @param ticketID
+     * @return
+     */
+    public String getTableMovedName(String ticketID) {
+        try {
+            m_result = new PreparedSentence(m_s,
+                "SELECT NAME FROM PLACES WHERE TICKETID = ? AND TABLEMOVED = " + TRUE,
+                SerializerWriteString.INSTANCE,
+                SerializerReadString.INSTANCE).find(ticketID);
+            return (String)m_result;
+        } catch (Exception e) {
+            Logger.getLogger(RestaurantDBUtils.class.getName()).log(Level.WARNING, null, e);
+        }
+        return null;
+    }
+
+    /**
+     *
+     * @param ticketID
+     * @return
+     */
+    public Boolean getTableMovedFlag(String ticketID) {
+        try {
+            m_result= new PreparedSentence(m_s,
+                "SELECT TABLEMOVED FROM PLACES WHERE TICKETID = ?",
+                SerializerWriteString.INSTANCE,
+                SerializerReadInteger.INSTANCE).find(ticketID);
+            return ((Integer)m_result==1)?true:false;
+            
+        } catch (Exception e) {
+            Logger.getLogger(RestaurantDBUtils.class.getName()).log(Level.WARNING, null, e);
+        }
+        return (false);
+    }
+
+    /**
+     *
+     * @param tableName
+     */
+    public void clearTableMovedFlag(String tableName) {
+        try {
+            new StaticSentence(m_s, "UPDATE PLACES SET TABLEMOVED=" + FALSE + " WHERE NAME=?", SerializerWriteString.INSTANCE).exec(tableName);
+        } catch (Exception e) {
+            Logger.getLogger(RestaurantDBUtils.class.getName()).log(Level.WARNING, null, e);
+        }
+    }
+
 }
-
