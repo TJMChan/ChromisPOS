@@ -40,8 +40,6 @@ import uk.chromis.pos.forms.DataLogicSystem;
  */
 public class RestaurantDBUtils {
 
-    public final static int TRUE = 1;
-    public final static int FALSE = 0;
     private Session m_s;
     private Object m_result;
     private AppView m_App;
@@ -388,7 +386,7 @@ public class RestaurantDBUtils {
      */
     public void setTableMovedFlag(String tableID) {
         try {
-            new StaticSentence(m_s, "UPDATE PLACES SET TABLEMOVED=" + TRUE + " WHERE ID=?", SerializerWriteString.INSTANCE).exec(tableID);
+            new StaticSentence(m_s, "UPDATE PLACES SET TABLEMOVED=" + m_s.DB.TRUE() + " WHERE ID=?", SerializerWriteString.INSTANCE).exec(tableID);
         } catch (Exception e) {
             Logger.getLogger(RestaurantDBUtils.class.getName()).log(Level.WARNING, null, e);
         }
@@ -402,7 +400,7 @@ public class RestaurantDBUtils {
     public String getTableMovedName(String ticketID) {
         try {
             m_result = new PreparedSentence(m_s,
-                "SELECT NAME FROM PLACES WHERE TICKETID = ? AND TABLEMOVED = " + TRUE,
+                "SELECT NAME FROM PLACES WHERE TICKETID = ? AND TABLEMOVED = " + m_s.DB.TRUE(),
                 SerializerWriteString.INSTANCE,
                 SerializerReadString.INSTANCE).find(ticketID);
             return (String)m_result;
@@ -437,7 +435,7 @@ public class RestaurantDBUtils {
      */
     public void clearTableMovedFlag(String tableName) {
         try {
-            new StaticSentence(m_s, "UPDATE PLACES SET TABLEMOVED=" + FALSE + " WHERE NAME=?", SerializerWriteString.INSTANCE).exec(tableName);
+            new StaticSentence(m_s, "UPDATE PLACES SET TABLEMOVED=" + m_s.DB.FALSE() + " WHERE NAME=?", SerializerWriteString.INSTANCE).exec(tableName);
         } catch (Exception e) {
             Logger.getLogger(RestaurantDBUtils.class.getName()).log(Level.WARNING, null, e);
         }

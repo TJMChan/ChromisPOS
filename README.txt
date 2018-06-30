@@ -1,3 +1,8 @@
+30th June 2018(TJMChan) - Wildfox Build 1806v1 release
+This release is to fix bug #52 with customer card scanning and possible Oracle issue with ResturantDBUtils class.
+
+***********************************************************************************************************
+
 06th May 2018(TJMChan) - Wildfox Build 1805v1 release to fix bug #156
 This release fixes bug #156(https://sourceforge.net/p/chromispos/bugs/156/) which causes Chromis to hang when
 auto refresh tables is enabled in restaurant mode.
